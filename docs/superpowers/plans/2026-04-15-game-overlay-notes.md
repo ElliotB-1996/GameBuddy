@@ -416,7 +416,7 @@ export function registerWindowHandlers(win: BrowserWindow): void {
 - [ ] **Step 3: Replace `src/main/index.ts` with the full main process**
 
 ```typescript
-import { app, shell, BrowserWindow, globalShortcut } from 'electron'
+import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { registerNotesHandlers } from './ipc/notes-handler'

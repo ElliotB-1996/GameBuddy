@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { registerNotesHandlers } from './ipc/notes-handler'
 import { registerWindowHandlers } from './ipc/window-handler'
 import { registerHotkeyHandlers, registerGlobalHotkeys, unregisterGlobalHotkeys } from './ipc/hotkeys-handler'
+import { registerVoiceHandlers } from './voice/voice-handler'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -50,6 +51,7 @@ app.whenReady().then(() => {
   const { initialData, loadError } = registerNotesHandlers()
   registerWindowHandlers(mainWindow)
   registerHotkeyHandlers(mainWindow)
+  registerVoiceHandlers(mainWindow)
 
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow!.webContents.send('notes:load', initialData, loadError)

@@ -35,11 +35,12 @@ describe('useNotes', () => {
     expect((result.current.sections[0].notes[0] as any).content).toBe('hello world')
   })
 
-  it('updateNote updates note content and bumps updatedAt', () => {
+  it('updateNote updates note content and bumps updatedAt', async () => {
     const { result } = renderHook(() => useNotes(baseData))
     act(() => result.current.addTextNote('s1', 'original'))
     const noteId = result.current.sections[0].notes[0].id
     const originalUpdatedAt = result.current.sections[0].notes[0].updatedAt
+    await new Promise((r) => setTimeout(r, 5))
     act(() => result.current.updateNote('s1', noteId, 'updated'))
     const updated = result.current.sections[0].notes[0]
     expect((updated as any).content).toBe('updated')

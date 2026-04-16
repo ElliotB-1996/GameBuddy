@@ -30,6 +30,11 @@ const api = {
     ipcRenderer.invoke("voice:transcribe", audioBuffer),
   updateHotkeys: (hotkeys: Hotkeys): Promise<void> =>
     ipcRenderer.invoke("hotkeys:update", hotkeys),
+  setOpacity: (opacity: number): Promise<void> =>
+    ipcRenderer.invoke("window:setOpacity", opacity),
+  notifyModeChanged: (mode: WindowMode): void => {
+    ipcRenderer.send("window:notifyModeChanged", mode);
+  },
 
   // Cleanup — removes only the listeners registered by this API
   removeVoiceAndHotkeyListeners: () => {

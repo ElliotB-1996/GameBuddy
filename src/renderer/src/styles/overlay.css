@@ -4,6 +4,25 @@
   box-sizing: border-box;
 }
 
+:root {
+  --overlay-bg: #0a0c10;
+  --overlay-header: #0a0c10;
+  --overlay-accent: #4ade80;
+  --overlay-text: #e2e8f0;
+  --overlay-note: #181c24;
+  --overlay-font-size: 13px;
+}
+
+@keyframes recording-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
 body {
   background: transparent;
   margin: 0;
@@ -13,16 +32,17 @@ body {
 }
 
 .overlay-root {
-  background: rgba(10, 12, 16, 0.82);
+  background: var(--overlay-bg);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
-  color: #e2e8f0;
+  color: var(--overlay-text);
   display: flex;
   flex-direction: column;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-size: var(--overlay-font-size);
   height: 100vh;
   overflow: hidden;
   position: relative;
@@ -30,6 +50,7 @@ body {
 
 .overlay-header {
   align-items: center;
+  background: var(--overlay-header);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   justify-content: space-between;

@@ -19,7 +19,7 @@ export function NoteCard({
   return (
     <div
       style={{
-        background: "rgba(255,255,255,0.07)",
+        background: "var(--overlay-note)",
         borderRadius: 6,
         border: "1px solid rgba(255,255,255,0.1)",
         padding: "8px 10px",

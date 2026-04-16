@@ -12,4 +12,6 @@ export function registerWindowHandlers(win: BrowserWindow): void {
   ipcMain.handle("window:setOpacity", (_event, opacity: number) => {
     win.setOpacity(Math.max(0, Math.min(1, opacity)));
   });
+
+  // TODO Task 8: ipcMain.on("window:notifyModeChanged", ...) registered in index.ts for tray icon label update
 }

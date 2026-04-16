@@ -39,8 +39,20 @@ export interface Settings {
   audioDeviceId?: string;
 }
 
+export interface Appearance {
+  bgColor: string;
+  headerColor: string;
+  accentColor: string;
+  textColor: string;
+  noteColor: string;
+  fontSize: number;
+  viewOpacity: number;
+  editOpacity: number;
+}
+
 export interface AppData {
   settings: Settings;
+  appearance: Appearance;
   sections: Section[];
 }
 

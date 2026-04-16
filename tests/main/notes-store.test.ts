@@ -6,6 +6,7 @@ import {
   loadNotes,
   saveNotes,
   DEFAULT_APP_DATA,
+  DEFAULT_APPEARANCE,
 } from "../../src/main/store/notes-store";
 import type { AppData } from "../../src/renderer/src/types";
 
@@ -49,5 +50,28 @@ describe("saveNotes", () => {
     saveNotes(filePath, DEFAULT_APP_DATA);
     const result = loadNotes(filePath);
     expect(result.data).toEqual(DEFAULT_APP_DATA);
+  });
+});
+
+describe("loadNotes appearance migration", () => {
+  it("fills in missing appearance with defaults for files saved without appearance field", () => {
+    const filePath = join(tempDir, "old-notes.json");
+    const oldData = { settings: DEFAULT_APP_DATA.settings, sections: [] };
+    writeFileSync(filePath, JSON.stringify(oldData), "utf-8");
+    const result = loadNotes(filePath);
+    expect(result.data.appearance).toEqual(DEFAULT_APPEARANCE);
+    expect(result.error).toBeNull();
+  });
+
+  it("merges partial appearance, preserving overridden fields and filling missing ones", () => {
+    const filePath = join(tempDir, "partial.json");
+    const partial = {
+      ...DEFAULT_APP_DATA,
+      appearance: { ...DEFAULT_APPEARANCE, bgColor: "#ff0000" },
+    };
+    writeFileSync(filePath, JSON.stringify(partial), "utf-8");
+    const result = loadNotes(filePath);
+    expect(result.data.appearance.bgColor).toBe("#ff0000");
+    expect(result.data.appearance.textColor).toBe(DEFAULT_APPEARANCE.textColor);
   });
 });

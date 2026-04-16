@@ -1,10 +1,18 @@
 import { useState, useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
-import type { AppData, Section, Note, Settings, ChecklistItem } from "../types";
+import type {
+  AppData,
+  Section,
+  Note,
+  Settings,
+  ChecklistItem,
+  Appearance,
+} from "../types";
 
 export interface UseNotesReturn {
   sections: Section[];
   settings: Settings;
+  appearance: Appearance;
   addSection: (name: string) => void;
   renameSection: (sectionId: string, name: string) => void;
   deleteSection: (sectionId: string) => void;
@@ -17,12 +25,16 @@ export interface UseNotesReturn {
   ) => void;
   deleteNote: (sectionId: string, noteId: string) => void;
   updateSettings: (settings: Settings) => void;
+  updateAppearance: (appearance: Appearance) => void;
   getAppData: () => AppData;
 }
 
 export function useNotes(initialData: AppData): UseNotesReturn {
   const [sections, setSections] = useState<Section[]>(initialData.sections);
   const [settings, setSettings] = useState<Settings>(initialData.settings);
+  const [appearance, setAppearance] = useState<Appearance>(
+    initialData.appearance,
+  );
 
   const now = (): string => new Date().toISOString();
 
@@ -103,14 +115,19 @@ export function useNotes(initialData: AppData): UseNotesReturn {
     setSettings(newSettings);
   }, []);
 
+  const updateAppearance = useCallback((newAppearance: Appearance) => {
+    setAppearance(newAppearance);
+  }, []);
+
   const getAppData = useCallback(
-    (): AppData => ({ settings, sections }),
-    [settings, sections],
+    (): AppData => ({ settings, appearance, sections }),
+    [settings, appearance, sections],
   );
 
   return {
     sections,
     settings,
+    appearance,
     addSection,
     renameSection,
     deleteSection,
@@ -119,6 +136,7 @@ export function useNotes(initialData: AppData): UseNotesReturn {
     updateNote,
     deleteNote,
     updateSettings,
+    updateAppearance,
     getAppData,
   };
 }

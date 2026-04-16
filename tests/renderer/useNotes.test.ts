@@ -11,6 +11,16 @@ const baseData: AppData = {
       startVoiceNote: "Alt+Shift+V",
     },
   },
+  appearance: {
+    bgColor: "#0a0c10",
+    headerColor: "#0a0c10",
+    accentColor: "#4ade80",
+    textColor: "#e2e8f0",
+    noteColor: "#181c24",
+    fontSize: 13,
+    viewOpacity: 0.82,
+    editOpacity: 1.0,
+  },
   sections: [{ id: "s1", name: "Game A", notes: [] }],
 };
 
@@ -61,5 +71,32 @@ describe("useNotes", () => {
     const noteId = result.current.sections[0].notes[0].id;
     act(() => result.current.deleteNote("s1", noteId));
     expect(result.current.sections[0].notes).toHaveLength(0);
+  });
+
+  it("initializes with provided appearance", () => {
+    const { result } = renderHook(() => useNotes(baseData));
+    expect(result.current.appearance.bgColor).toBe("#0a0c10");
+  });
+
+  it("updateAppearance updates the appearance state", () => {
+    const { result } = renderHook(() => useNotes(baseData));
+    act(() =>
+      result.current.updateAppearance({
+        ...baseData.appearance,
+        bgColor: "#ff0000",
+      }),
+    );
+    expect(result.current.appearance.bgColor).toBe("#ff0000");
+  });
+
+  it("getAppData includes current appearance", () => {
+    const { result } = renderHook(() => useNotes(baseData));
+    act(() =>
+      result.current.updateAppearance({
+        ...baseData.appearance,
+        fontSize: 16,
+      }),
+    );
+    expect(result.current.getAppData().appearance.fontSize).toBe(16);
   });
 });

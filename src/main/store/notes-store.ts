@@ -1,6 +1,17 @@
 import { readFileSync, writeFileSync, mkdirSync } from "fs";
 import { dirname } from "path";
-import type { AppData } from "../../renderer/src/types";
+import type { AppData, Appearance } from "../../renderer/src/types";
+
+export const DEFAULT_APPEARANCE: Appearance = {
+  bgColor: "#0a0c10",
+  headerColor: "#0a0c10",
+  accentColor: "#4ade80",
+  textColor: "#e2e8f0",
+  noteColor: "#181c24",
+  fontSize: 13,
+  viewOpacity: 0.82,
+  editOpacity: 1.0,
+};
 
 export const DEFAULT_APP_DATA: AppData = {
   settings: {
@@ -11,6 +22,7 @@ export const DEFAULT_APP_DATA: AppData = {
     },
     audioDeviceId: "",
   },
+  appearance: DEFAULT_APPEARANCE,
   sections: [],
 };
 
@@ -20,7 +32,13 @@ export function loadNotes(filePath: string): {
 } {
   try {
     const raw = readFileSync(filePath, "utf-8");
-    const data = JSON.parse(raw) as AppData;
+    const parsed = JSON.parse(raw) as Partial<AppData>;
+    const data: AppData = {
+      ...DEFAULT_APP_DATA,
+      ...parsed,
+      settings: { ...DEFAULT_APP_DATA.settings, ...parsed.settings },
+      appearance: { ...DEFAULT_APPEARANCE, ...(parsed.appearance ?? {}) },
+    };
     return { data, error: null };
   } catch (err: unknown) {
     if (

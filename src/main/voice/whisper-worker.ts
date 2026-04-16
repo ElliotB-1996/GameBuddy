@@ -24,7 +24,7 @@ async function run(): Promise<void> {
 
     const transcriber = await pipeline(
       "automatic-speech-recognition",
-      "Xenova/whisper-tiny",
+      "Xenova/whisper-small",
     );
 
     const audioData = Float32Array.from(

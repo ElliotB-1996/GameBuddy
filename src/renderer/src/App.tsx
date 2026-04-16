@@ -2,6 +2,7 @@ import { JSX, useCallback, useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { ModeIndicator } from "./components/ModeIndicator";
 import { NoteList } from "./components/NoteList";
+import { RecordingDot } from "./components/RecordingDot";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { TabBar } from "./components/TabBar";
 import { Toast } from "./components/Toast";
@@ -194,6 +195,7 @@ function NotesApp({
             paddingRight: 8,
           }}
         >
+          {audioState === "recording" && <RecordingDot />}
           <button
             onClick={() => setShowSettings((s) => !s)}
             title="Settings"

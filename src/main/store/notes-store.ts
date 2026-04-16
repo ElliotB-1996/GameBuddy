@@ -36,7 +36,14 @@ export function loadNotes(filePath: string): {
     const data: AppData = {
       ...DEFAULT_APP_DATA,
       ...parsed,
-      settings: { ...DEFAULT_APP_DATA.settings, ...parsed.settings },
+      settings: {
+        ...DEFAULT_APP_DATA.settings,
+        ...parsed.settings,
+        hotkeys: {
+          ...DEFAULT_APP_DATA.settings.hotkeys,
+          ...(parsed.settings?.hotkeys ?? {}),
+        },
+      },
       appearance: { ...DEFAULT_APPEARANCE, ...(parsed.appearance ?? {}) },
     };
     return { data, error: null };

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { mkdtempSync, writeFileSync, rmSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
@@ -14,6 +14,10 @@ let tempDir: string;
 
 beforeEach(() => {
   tempDir = mkdtempSync(join(tmpdir(), "notes-test-"));
+});
+
+afterEach(() => {
+  rmSync(tempDir, { recursive: true, force: true });
 });
 
 describe("loadNotes", () => {
@@ -73,5 +77,27 @@ describe("loadNotes appearance migration", () => {
     const result = loadNotes(filePath);
     expect(result.data.appearance.bgColor).toBe("#ff0000");
     expect(result.data.appearance.textColor).toBe(DEFAULT_APPEARANCE.textColor);
+  });
+});
+
+describe("loadNotes settings migration", () => {
+  it("fills in missing hotkeys with defaults for files with partial hotkeys", () => {
+    const filePath = join(tempDir, "partial-hotkeys.json");
+    const partial = {
+      ...DEFAULT_APP_DATA,
+      settings: {
+        ...DEFAULT_APP_DATA.settings,
+        hotkeys: { toggleVisibility: "Ctrl+H" },
+      },
+    };
+    writeFileSync(filePath, JSON.stringify(partial), "utf-8");
+    const result = loadNotes(filePath);
+    expect(result.data.settings.hotkeys.toggleVisibility).toBe("Ctrl+H");
+    expect(result.data.settings.hotkeys.toggleEditMode).toBe(
+      DEFAULT_APP_DATA.settings.hotkeys.toggleEditMode,
+    );
+    expect(result.data.settings.hotkeys.startVoiceNote).toBe(
+      DEFAULT_APP_DATA.settings.hotkeys.startVoiceNote,
+    );
   });
 });

@@ -59,4 +59,14 @@ describe("applyTheme", () => {
       document.documentElement.style.getPropertyValue("--overlay-font-size"),
     ).toBe("15px");
   });
+
+  it("does not set opacity CSS variables", () => {
+    applyTheme(appearance);
+    expect(
+      document.documentElement.style.getPropertyValue("--overlay-view-opacity"),
+    ).toBe("");
+    expect(
+      document.documentElement.style.getPropertyValue("--overlay-edit-opacity"),
+    ).toBe("");
+  });
 });

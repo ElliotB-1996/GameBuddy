@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, session } from "electron";
+import { app, shell, BrowserWindow, session, Tray, Menu, ipcMain } from "electron";
 import { join } from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import { registerNotesHandlers } from "./ipc/notes-handler";
@@ -9,6 +9,7 @@ import {
   unregisterGlobalHotkeys,
 } from "./ipc/hotkeys-handler";
 import { registerVoiceHandlers } from "./voice/voice-handler";
+import { buildTrayMenuItems, type TrayMode } from "./tray-menu";
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -18,7 +19,7 @@ function createWindow(): BrowserWindow {
     height: 680,
     frame: false,
     transparent: true,
-    skipTaskbar: false,
+    skipTaskbar: true,
     resizable: true,
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
@@ -70,6 +71,49 @@ app.whenReady().then(() => {
   });
 
   mainWindow = createWindow();
+
+  // Tray setup
+  let currentMode: TrayMode = "view";
+  const trayIconPath = is.dev
+    ? join(__dirname, "../../resources/tray-icon.png")
+    : join(process.resourcesPath, "tray-icon.png");
+  const tray = new Tray(trayIconPath);
+  tray.setToolTip("Overlay — View Mode");
+
+  function rebuildTrayMenu(): void {
+    tray.setToolTip(
+      `Overlay — ${currentMode === "view" ? "View" : "Edit"} Mode`,
+    );
+    tray.setContextMenu(
+      Menu.buildFromTemplate(
+        buildTrayMenuItems(
+          mainWindow!.isVisible(),
+          currentMode,
+          () => {
+            if (mainWindow!.isVisible()) {
+              mainWindow!.hide();
+            } else {
+              mainWindow!.show();
+            }
+            rebuildTrayMenu();
+          },
+          () => {
+            mainWindow!.webContents.send("hotkey:toggleEditMode");
+          },
+          () => {
+            app.quit();
+          },
+        ),
+      ),
+    );
+  }
+
+  rebuildTrayMenu();
+
+  ipcMain.on("window:notifyModeChanged", (_event, mode: TrayMode) => {
+    currentMode = mode;
+    rebuildTrayMenu();
+  });
 
   const modelPath = is.dev
     ? join(__dirname, "../../resources/models")

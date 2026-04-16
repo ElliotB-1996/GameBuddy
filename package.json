@@ -32,6 +32,10 @@
         "filter": [
           "**/*"
         ]
+      },
+      {
+        "from": "resources/tray-icon.png",
+        "to": "tray-icon.png"
       }
     ]
   },

@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import type { WindowMode } from "../types";
 
 interface Props {
@@ -5,7 +6,7 @@ interface Props {
   onToggle: () => void;
 }
 
-export function ModeIndicator({ mode, onToggle }: Props) {
+export function ModeIndicator({ mode, onToggle }: Props): JSX.Element {
   return (
     <button
       onClick={onToggle}

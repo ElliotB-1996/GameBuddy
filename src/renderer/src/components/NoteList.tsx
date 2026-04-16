@@ -1,5 +1,6 @@
 import { NoteCard } from "./NoteCard";
 import type { Note } from "../types";
+import { JSX } from "react";
 
 interface Props {
   notes: Note[];
@@ -8,7 +9,12 @@ interface Props {
   onDelete: (noteId: string) => void;
 }
 
-export function NoteList({ notes, isEditMode, onUpdate, onDelete }: Props) {
+export function NoteList({
+  notes,
+  isEditMode,
+  onUpdate,
+  onDelete,
+}: Props): JSX.Element {
   const sorted = [...notes].sort(
     (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
   );

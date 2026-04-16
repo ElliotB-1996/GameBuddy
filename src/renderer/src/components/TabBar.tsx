@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { JSX, useState } from "react";
 import type { Section } from "../types";
 
 interface Props {
@@ -17,26 +17,26 @@ export function TabBar({
   onAdd,
   onRename,
   isEditMode,
-}: Props) {
+}: Props): JSX.Element {
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [addingNew, setAddingNew] = useState(false);
   const [newName, setNewName] = useState("");
 
-  const handleRenameStart = (id: string, currentName: string) => {
+  const handleRenameStart = (id: string, currentName: string): void => {
     if (!isEditMode) return;
     setRenamingId(id);
     setRenameValue(currentName);
   };
 
-  const handleRenameCommit = () => {
+  const handleRenameCommit = (): void => {
     if (renamingId && renameValue.trim()) {
       onRename(renamingId, renameValue.trim());
     }
     setRenamingId(null);
   };
 
-  const handleAddCommit = () => {
+  const handleAddCommit = (): void => {
     if (newName.trim()) onAdd(newName.trim());
     setAddingNew(false);
     setNewName("");

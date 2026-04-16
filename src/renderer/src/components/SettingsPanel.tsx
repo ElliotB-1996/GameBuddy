@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, JSX } from "react";
 import type { Hotkeys } from "../types";
 
 interface AudioDevice {
@@ -26,7 +26,7 @@ export function SettingsPanel({
   audioDeviceId,
   onSave,
   onClose,
-}: Props) {
+}: Props): JSX.Element {
   const [draft, setDraft] = useState<Hotkeys>({ ...hotkeys });
   const [draftDeviceId, setDraftDeviceId] = useState(audioDeviceId);
   const [capturing, setCapturing] = useState<HotkeyKey | null>(null);

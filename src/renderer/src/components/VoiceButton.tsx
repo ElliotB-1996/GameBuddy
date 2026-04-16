@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import type { AudioState } from "../hooks/useAudio";
 
 interface Props {
@@ -6,7 +7,11 @@ interface Props {
   onToggle: () => void;
 }
 
-export function VoiceButton({ audioState, isEditMode, onToggle }: Props) {
+export function VoiceButton({
+  audioState,
+  isEditMode,
+  onToggle,
+}: Props): JSX.Element {
   const isRecording = audioState === "recording";
   const isProcessing = audioState === "processing";
 

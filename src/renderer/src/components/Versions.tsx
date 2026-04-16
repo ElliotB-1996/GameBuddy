@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { JSX, useState } from "react";
 
-function Versions() {
+function Versions(): JSX.Element {
   const [versions] = useState(window.electron.process.versions);
 
   return (

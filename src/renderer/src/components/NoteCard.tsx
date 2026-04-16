@@ -1,6 +1,7 @@
 import { TextNote } from "./TextNote";
 import { ChecklistNote } from "./ChecklistNote";
 import type { Note } from "../types";
+import { JSX } from "react";
 
 interface Props {
   note: Note;
@@ -9,7 +10,12 @@ interface Props {
   onDelete: () => void;
 }
 
-export function NoteCard({ note, isEditMode, onUpdate, onDelete }: Props) {
+export function NoteCard({
+  note,
+  isEditMode,
+  onUpdate,
+  onDelete,
+}: Props): JSX.Element {
   return (
     <div
       style={{

@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import type { ChecklistItem } from "../types";
+import { JSX } from "react";
 
 interface Props {
   items: ChecklistItem[];
@@ -7,16 +8,21 @@ interface Props {
   onChange: (items: ChecklistItem[]) => void;
 }
 
-export function ChecklistNote({ items, isEditMode, onChange }: Props) {
-  const toggle = (id: string) =>
+export function ChecklistNote({
+  items,
+  isEditMode,
+  onChange,
+}: Props): JSX.Element {
+  const toggle = (id: string): void =>
     onChange(
       items.map((i) => (i.id === id ? { ...i, checked: !i.checked } : i)),
     );
-  const updateText = (id: string, text: string) =>
+  const updateText = (id: string, text: string): void =>
     onChange(items.map((i) => (i.id === id ? { ...i, text } : i)));
-  const addItem = () =>
+  const addItem = (): void =>
     onChange([...items, { id: uuidv4(), text: "", checked: false }]);
-  const removeItem = (id: string) => onChange(items.filter((i) => i.id !== id));
+  const removeItem = (id: string): void =>
+    onChange(items.filter((i) => i.id !== id));
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>

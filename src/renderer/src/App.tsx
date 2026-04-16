@@ -1,17 +1,17 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { JSX, useCallback, useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import type { AppData, WindowMode, ToastMessage } from "./types";
-import { useNotes } from "./hooks/useNotes";
-import { useAudio } from "./hooks/useAudio";
-import { TabBar } from "./components/TabBar";
-import { NoteList } from "./components/NoteList";
-import { VoiceButton } from "./components/VoiceButton";
 import { ModeIndicator } from "./components/ModeIndicator";
+import { NoteList } from "./components/NoteList";
 import { SettingsPanel } from "./components/SettingsPanel";
+import { TabBar } from "./components/TabBar";
 import { Toast } from "./components/Toast";
+import { VoiceButton } from "./components/VoiceButton";
+import { useAudio } from "./hooks/useAudio";
+import { useNotes } from "./hooks/useNotes";
 import "./styles/overlay.css";
+import type { AppData, ToastMessage, WindowMode } from "./types";
 
-export default function App() {
+export default function App(): JSX.Element {
   const [initialData, setInitialData] = useState<AppData | null>(null);
   const [initialLoadError, setInitialLoadError] = useState<string | null>(null);
 
@@ -53,7 +53,7 @@ function NotesApp({
 }: {
   initialData: AppData;
   initialLoadError: string | null;
-}) {
+}): JSX.Element {
   const notes = useNotes(initialData);
   const {
     audioState,
@@ -147,8 +147,10 @@ function NotesApp({
     } else if (audioState === "idle" && sectionId) {
       await startRecording(notes.settings.audioDeviceId || undefined);
     }
+    //todo claude to fix these lint issues
   }, [audioState, startRecording, stopRecording, addToast]);
 
+  // todo claude this is a bit hacky, can we move this logic into the hook or somewhere else so we don't have to use refs to access the latest values?
   const voiceToggleRef = useRef(handleVoiceToggle);
   voiceToggleRef.current = handleVoiceToggle;
 

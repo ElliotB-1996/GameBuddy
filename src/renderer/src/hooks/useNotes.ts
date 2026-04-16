@@ -24,7 +24,7 @@ export function useNotes(initialData: AppData): UseNotesReturn {
   const [sections, setSections] = useState<Section[]>(initialData.sections);
   const [settings, setSettings] = useState<Settings>(initialData.settings);
 
-  const now = () => new Date().toISOString();
+  const now = (): string => new Date().toISOString();
 
   const addSection = useCallback((name: string) => {
     setSections((prev) => [...prev, { id: uuidv4(), name, notes: [] }]);

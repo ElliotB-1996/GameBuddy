@@ -10,6 +10,7 @@ import { VoiceButton } from "./components/VoiceButton";
 import { useAudio } from "./hooks/useAudio";
 import { useNotes } from "./hooks/useNotes";
 import "./styles/overlay.css";
+import { applyTheme } from "./utils/theme";
 import type { AppData, ToastMessage, WindowMode } from "./types";
 
 export default function App(): JSX.Element {
@@ -124,6 +125,19 @@ function NotesApp({
     if (audioError) addToast(audioError);
   }, [audioError, addToast]);
 
+  useEffect(() => {
+    applyTheme(notes.appearance);
+  }, [notes.appearance]);
+
+  useEffect(() => {
+    const opacity =
+      mode === "edit"
+        ? notes.appearance.editOpacity
+        : notes.appearance.viewOpacity;
+    window.api.setOpacity(opacity);
+    window.api.notifyModeChanged(mode);
+  }, [mode, notes.appearance.editOpacity, notes.appearance.viewOpacity]);
+
   const handleToggleMode = useCallback(() => {
     setMode((prev) => {
       const next: WindowMode = prev === "view" ? "edit" : "view";
@@ -171,7 +185,7 @@ function NotesApp({
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
-  }, [notes.sections, notes.settings]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [notes.sections, notes.settings, notes.appearance]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const activeSection =
     notes.sections.find((s) => s.id === activeSectionId) ?? null;
@@ -218,7 +232,9 @@ function NotesApp({
         <SettingsPanel
           hotkeys={notes.settings.hotkeys}
           audioDeviceId={notes.settings.audioDeviceId ?? ""}
+          appearance={notes.appearance}
           onSave={handleSaveSettings}
+          onAppearanceChange={notes.updateAppearance}
           onClose={() => setShowSettings(false)}
         />
       )}

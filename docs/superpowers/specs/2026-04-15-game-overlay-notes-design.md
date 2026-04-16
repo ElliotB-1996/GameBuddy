@@ -21,15 +21,15 @@ A desktop overlay application for gamers that provides always-on-top note-taking
 
 ### IPC Channels (typed)
 
-| Channel | Direction | Purpose |
-|---|---|---|
-| `notes:load` | main → renderer | Send full notes state on startup |
-| `notes:save` | renderer → main | Persist updated notes/settings to disk |
-| `window:setMode` | renderer → main | Switch between view/edit mode |
-| `voice:transcribe` | renderer → main | Send finished audio buffer for transcription |
-| `voice:result` | main → renderer | Return transcribed text |
-| `voice:progress` | main → renderer | Model download progress (first run) |
-| `hotkeys:update` | renderer → main | Re-register global shortcuts after settings change |
+| Channel            | Direction       | Purpose                                            |
+| ------------------ | --------------- | -------------------------------------------------- |
+| `notes:load`       | main → renderer | Send full notes state on startup                   |
+| `notes:save`       | renderer → main | Persist updated notes/settings to disk             |
+| `window:setMode`   | renderer → main | Switch between view/edit mode                      |
+| `voice:transcribe` | renderer → main | Send finished audio buffer for transcription       |
+| `voice:result`     | main → renderer | Return transcribed text                            |
+| `voice:progress`   | main → renderer | Model download progress (first run)                |
+| `hotkeys:update`   | renderer → main | Re-register global shortcuts after settings change |
 
 ---
 
@@ -46,9 +46,9 @@ A desktop overlay application for gamers that provides always-on-top note-taking
 
 Three configurable hotkeys, stored in `settings.hotkeys`. Re-registered via `globalShortcut` whenever changed.
 
-| Action | Default |
-|---|---|
-| Show / hide overlay | `Alt+Shift+N` |
+| Action                  | Default       |
+| ----------------------- | ------------- |
+| Show / hide overlay     | `Alt+Shift+N` |
 | Toggle view / edit mode | `Alt+Shift+E` |
 | Start / stop voice note | `Alt+Shift+V` |
 
@@ -128,6 +128,7 @@ Stored at `app.getPath('userData')/notes.json`.
 ## Settings Panel
 
 Accessible via the gear icon. Supports:
+
 - Rebinding all three hotkeys (click field → press combo → save)
 - Adding and renaming sections (also available inline from the tab bar)
 
@@ -135,11 +136,11 @@ Accessible via the gear icon. Supports:
 
 ## Error Handling
 
-| Scenario | Behaviour |
-|---|---|
-| `notes.json` missing on startup | Create with empty sections and default hotkeys |
-| `notes.json` corrupted | Show error toast, fall back to empty state (do not overwrite until user makes a change) |
-| Hotkey already registered by OS/another app | Show warning in settings, keep previous binding |
-| Microphone permission denied | Toast error, voice button disabled until permission granted |
-| Whisper download fails | Toast error with retry button |
-| Transcription fails | Toast error, no note created |
+| Scenario                                    | Behaviour                                                                               |
+| ------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `notes.json` missing on startup             | Create with empty sections and default hotkeys                                          |
+| `notes.json` corrupted                      | Show error toast, fall back to empty state (do not overwrite until user makes a change) |
+| Hotkey already registered by OS/another app | Show warning in settings, keep previous binding                                         |
+| Microphone permission denied                | Toast error, voice button disabled until permission granted                             |
+| Whisper download fails                      | Toast error with retry button                                                           |
+| Transcription fails                         | Toast error, no note created                                                            |

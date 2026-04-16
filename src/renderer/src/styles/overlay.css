@@ -1,4 +1,6 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -19,7 +21,8 @@ body {
   color: #e2e8f0;
   display: flex;
   flex-direction: column;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   height: 100vh;
   overflow: hidden;
   position: relative;
@@ -51,7 +54,7 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: 8px 10px;
-  scrollbar-color: rgba(255,255,255,0.1) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
   scrollbar-width: thin;
 }
 

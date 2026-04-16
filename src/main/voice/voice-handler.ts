@@ -1,33 +1,53 @@
-import { ipcMain, app, BrowserWindow } from 'electron'
-import { Worker } from 'worker_threads'
-import { join } from 'path'
+import { ipcMain, BrowserWindow } from "electron";
+import { Worker } from "worker_threads";
+import { join } from "path";
 
-export function registerVoiceHandlers(win: BrowserWindow): void {
-  ipcMain.handle('voice:transcribe', async (_event, audioBuffer: Float32Array) => {
-    const workerPath = join(__dirname, 'whisper-worker.js')
-    const cacheDir = join(app.getPath('userData'), 'whisper-cache')
+export const MAX_AUDIO_SAMPLES = 60 * 16_000; // 60 seconds at 16 kHz
 
-    return new Promise<void>((resolve) => {
-      const worker = new Worker(workerPath, {
-        workerData: { audioBuffer: Array.from(audioBuffer), cacheDir }
-      })
+export function validateAudioBuffer(buffer: number[]): string | null {
+  if (buffer.length === 0) return "Audio buffer is empty.";
+  if (buffer.length > MAX_AUDIO_SAMPLES)
+    return "Recording exceeds the 60-second maximum.";
+  return null;
+}
 
-      worker.on('message', (msg: { type: string; value?: number; text?: string; message?: string }) => {
-        if (msg.type === 'progress' && msg.value !== undefined) {
-          win.webContents.send('voice:progress', msg.value)
-        } else if (msg.type === 'result') {
-          win.webContents.send('voice:result', msg.text)
-          resolve()
-        } else if (msg.type === 'error') {
-          win.webContents.send('voice:result', null, msg.message)
-          resolve()
-        }
-      })
+export function registerVoiceHandlers(
+  win: BrowserWindow,
+  modelPath: string,
+): void {
+  ipcMain.handle(
+    "voice:transcribe",
+    async (_event, audioBuffer: Float32Array) => {
+      const bufferArray = Array.from(audioBuffer);
+      const validationError = validateAudioBuffer(bufferArray);
+      if (validationError) {
+        throw new Error(validationError);
+      }
 
-      worker.on('error', (err) => {
-        win.webContents.send('voice:result', null, err.message)
-        resolve()
-      })
-    })
-  })
+      const workerPath = join(__dirname, "whisper-worker.js");
+
+      return new Promise<void>((resolve) => {
+        const worker = new Worker(workerPath, {
+          workerData: { audioBuffer: bufferArray, modelPath },
+        });
+        worker.on(
+          "message",
+          (msg: { type: string; text?: string; message?: string }) => {
+            if (msg.type === "result") {
+              win.webContents.send("voice:result", msg.text);
+              resolve();
+            } else if (msg.type === "error") {
+              win.webContents.send("voice:result", null, msg.message);
+              resolve();
+            }
+          },
+        );
+
+        worker.on("error", (err) => {
+          win.webContents.send("voice:result", null, err.message);
+          resolve();
+        });
+      });
+    },
+  );
 }

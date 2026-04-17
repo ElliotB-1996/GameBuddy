@@ -7,6 +7,7 @@ interface Props {
   isEditMode: boolean;
   onUpdate: (noteId: string, content: Note["content"]) => void;
   onDelete: (noteId: string) => void;
+  onToggleCollapsed: (noteId: string) => void;
 }
 
 export function NoteList({
@@ -14,6 +15,7 @@ export function NoteList({
   isEditMode,
   onUpdate,
   onDelete,
+  onToggleCollapsed,
 }: Props): JSX.Element {
   const sorted = [...notes].sort(
     (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
@@ -44,6 +46,7 @@ export function NoteList({
           isEditMode={isEditMode}
           onUpdate={(content) => onUpdate(note.id, content)}
           onDelete={() => onDelete(note.id)}
+          onToggleCollapsed={() => onToggleCollapsed(note.id)}
         />
       ))}
     </div>

@@ -37,53 +37,54 @@ export function NoteCard({
         position: "relative",
       }}
     >
-      <button
-        onClick={onToggleCollapsed}
-        aria-label="toggle note collapsed"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          padding: "7px 10px",
-          textAlign: "left",
-        }}
-      >
-        <span
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <button
+          onClick={onToggleCollapsed}
+          aria-label="toggle note collapsed"
+          aria-expanded={!isCollapsed}
           style={{
-            color: "#e2e8f0",
-            fontSize: 13,
             flex: 1,
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
+            display: "flex",
+            alignItems: "center",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: "7px 10px",
+            textAlign: "left",
           }}
         >
-          {getNotePreview(note)}
-        </span>
-        {isEditMode && (
           <span
-            role="button"
-            title="Delete note"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}
             style={{
+              color: "#e2e8f0",
+              fontSize: 13,
+              flex: 1,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {getNotePreview(note)}
+          </span>
+        </button>
+
+        {isEditMode && (
+          <button
+            onClick={onDelete}
+            title="Delete note"
+            style={{
+              background: "none",
+              border: "none",
               color: "#64748b",
               cursor: "pointer",
               fontSize: 12,
-              marginLeft: 8,
+              padding: "7px 10px",
               flexShrink: 0,
             }}
           >
             ✕
-          </span>
+          </button>
         )}
-      </button>
+      </div>
 
       {!isCollapsed && (
         <div style={{ padding: "0 10px 8px" }}>

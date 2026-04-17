@@ -288,6 +288,9 @@ function NotesApp({
               notes.updateNote(activeSection.id, noteId, content)
             }
             onDelete={(noteId) => notes.deleteNote(activeSection.id, noteId)}
+            onToggleCollapsed={(noteId) =>
+              notes.toggleNoteCollapsed(activeSection.id, noteId)
+            }
           />
         ) : (
           <div

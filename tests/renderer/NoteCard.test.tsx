@@ -153,4 +153,21 @@ describe("NoteCard collapse/expand", () => {
     );
     expect(screen.getByTitle("Delete note")).toBeInTheDocument();
   });
+
+  it("delete button calls onDelete, not onToggleCollapsed", async () => {
+    const del = vi.fn();
+    const toggle = vi.fn();
+    render(
+      <NoteCard
+        note={{ ...textNote, collapsed: true }}
+        isEditMode={true}
+        onUpdate={noop}
+        onDelete={del}
+        onToggleCollapsed={toggle}
+      />,
+    );
+    await userEvent.click(screen.getByTitle("Delete note"));
+    expect(del).toHaveBeenCalledOnce();
+    expect(toggle).not.toHaveBeenCalled();
+  });
 });

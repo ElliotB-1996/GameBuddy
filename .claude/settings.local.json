@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//tmp/**)",
+      "Bash(npm create *)",
+      "Bash(cp -r /tmp/electron-scaffold-test/src /mnt/c/Users/ellio/Documents/ClaudeTesting/)",
+      "Bash(cp -r /tmp/electron-scaffold-test/build /mnt/c/Users/ellio/Documents/ClaudeTesting/)",
+      "Bash(cp -r /tmp/electron-scaffold-test/resources /mnt/c/Users/ellio/Documents/ClaudeTesting/)",
+      "Bash(cp /tmp/electron-scaffold-test/package.json /mnt/c/Users/ellio/Documents/ClaudeTesting/)",
+      "Bash(cp /tmp/electron-scaffold-test/electron.vite.config.ts /mnt/c/Users/ellio/Documents/ClaudeTesting/)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Read(//home/ellio/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/requesting-code-review/**)",
+      "Read(//home/ellio/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/agents/**)",
+      "Bash(npm test *)",
+      "Bash(ls /mnt/c/Users/ellio/Documents/ClaudeTesting/src/renderer/src/types*)",
+      "Bash(npx vitest *)",
+      "Bash(npx tsc *)",
+      "Bash(git rm *)",
+      "PowerShell(npm test *)"
+    ]
+  }
+}

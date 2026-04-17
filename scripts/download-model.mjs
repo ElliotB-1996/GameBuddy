@@ -1,5 +1,5 @@
 /**
- * Downloads the Xenova/whisper-tiny model into resources/models/ so it can be
+ * Downloads the Xenova/whisper-small model into resources/models/ so it can be
  * bundled with the app. Run once before building:
  *
  *   npm run download-model
@@ -12,8 +12,8 @@ import { mkdirSync, createWriteStream, existsSync } from "fs";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const modelDir = join(__dirname, "..", "resources", "models");
 
-// Files required by @xenova/transformers for Xenova/whisper-tiny ASR
-const MODEL_ID = "Xenova/whisper-tiny";
+// Files required by @xenova/transformers for Xenova/whisper-small ASR
+const MODEL_ID = "Xenova/whisper-small";
 const BASE_URL = `https://huggingface.co/${MODEL_ID}/resolve/main`;
 
 const FILES = [

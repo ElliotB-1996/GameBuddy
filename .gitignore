@@ -5,4 +5,6 @@ out
 .eslintcache
 *.log*
 *.tsbuildinfo
-.eslintcache
+lint_output.txt
+test_output.txt
+resources/models/

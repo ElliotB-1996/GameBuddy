@@ -1808,7 +1808,7 @@ async function run() {
 
     const transcriber = await pipeline(
       "automatic-speech-recognition",
-      "Xenova/whisper-tiny",
+      "Xenova/whisper-small",
       {
         progress_callback: progressCallback,
       },

@@ -8,6 +8,7 @@ export interface TextNote {
   id: string;
   type: "text";
   content: string;
+  collapsed?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -16,6 +17,7 @@ export interface ChecklistNote {
   id: string;
   type: "checklist";
   content: ChecklistItem[];
+  collapsed?: boolean;
   createdAt: string;
   updatedAt: string;
 }

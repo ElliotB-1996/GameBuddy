@@ -101,3 +101,32 @@ describe("loadNotes settings migration", () => {
     );
   });
 });
+
+describe("saveNotes and loadNotes round-trip", () => {
+  it("round-trips collapsed field on notes", () => {
+    const filePath = join(tempDir, "collapsed-test.json");
+    const data: AppData = {
+      settings: { hotkeys: { toggleVisibility: "Alt+H", toggleEditMode: "Alt+E", startVoiceNote: "Alt+V" } },
+      appearance: {
+        bgColor: "#0f172a", headerColor: "#1e293b", accentColor: "#6366f1",
+        textColor: "#e2e8f0", noteColor: "#1e293b", fontSize: 13,
+        viewOpacity: 0.85, editOpacity: 1,
+      },
+      sections: [{
+        id: "s1",
+        name: "Test",
+        notes: [{
+          id: "n1",
+          type: "text",
+          content: "hello",
+          collapsed: false,
+          createdAt: "2026-01-01T00:00:00Z",
+          updatedAt: "2026-01-01T00:00:00Z",
+        }],
+      }],
+    };
+    saveNotes(filePath, data);
+    const loaded = loadNotes(filePath);
+    expect(loaded.data.sections[0].notes[0]).toMatchObject({ collapsed: false });
+  });
+});

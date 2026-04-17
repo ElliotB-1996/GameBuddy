@@ -71,6 +71,7 @@ export function NoteCard({
           <button
             onClick={onDelete}
             title="Delete note"
+            aria-label="Delete note"
             style={{
               background: "none",
               border: "none",

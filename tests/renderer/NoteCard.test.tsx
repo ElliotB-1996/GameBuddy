@@ -170,4 +170,36 @@ describe("NoteCard collapse/expand", () => {
     expect(del).toHaveBeenCalledOnce();
     expect(toggle).not.toHaveBeenCalled();
   });
+
+  it("toggle button has aria-expanded false when collapsed", () => {
+    render(
+      <NoteCard
+        note={{ ...textNote, collapsed: true }}
+        isEditMode={false}
+        onUpdate={noop}
+        onDelete={noop}
+        onToggleCollapsed={noop}
+      />,
+    );
+    expect(screen.getByRole("button", { name: /toggle/i })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+  });
+
+  it("toggle button has aria-expanded true when expanded", () => {
+    render(
+      <NoteCard
+        note={{ ...textNote, collapsed: false }}
+        isEditMode={false}
+        onUpdate={noop}
+        onDelete={noop}
+        onToggleCollapsed={noop}
+      />,
+    );
+    expect(screen.getByRole("button", { name: /toggle/i })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+  });
 });

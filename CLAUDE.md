@@ -2,9 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Run lint tests as you go and fix any possible warnings
+Run lint as you go and fix any warnings immediately
 
-Always update and create relevant unit tests related to the task
+Write unit tests for each task as you implement it, but only run the full test suite at the end of a feature (not after every task)
 
 Always create todo lists to track progress
 

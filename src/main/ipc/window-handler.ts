@@ -12,5 +12,4 @@ export function registerWindowHandlers(win: BrowserWindow): void {
   ipcMain.handle("window:setOpacity", (_event, opacity: number) => {
     win.setOpacity(Math.max(0, Math.min(1, opacity)));
   });
-
 }

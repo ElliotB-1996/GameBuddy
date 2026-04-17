@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import type { ChecklistItem } from "../types";
-import { JSX } from "react";
+import { JSX, useRef, useEffect, useCallback } from "react";
 
 interface Props {
   items: ChecklistItem[];
@@ -13,6 +13,30 @@ export function ChecklistNote({
   isEditMode,
   onChange,
 }: Props): JSX.Element {
+  const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
+  const pendingFocusId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (pendingFocusId.current) {
+      const el = inputRefs.current.get(pendingFocusId.current);
+      if (el) {
+        el.focus();
+      }
+      pendingFocusId.current = null;
+    }
+  }, [items]);
+
+  const setInputRef = useCallback(
+    (id: string) => (el: HTMLInputElement | null) => {
+      if (el) {
+        inputRefs.current.set(id, el);
+      } else {
+        inputRefs.current.delete(id);
+      }
+    },
+    [],
+  );
+
   const toggle = (id: string): void =>
     onChange(
       items.map((i) => (i.id === id ? { ...i, checked: !i.checked } : i)),
@@ -21,6 +45,18 @@ export function ChecklistNote({
     onChange(items.map((i) => (i.id === id ? { ...i, text } : i)));
   const addItem = (): void =>
     onChange([...items, { id: uuidv4(), text: "", checked: false }]);
+  const insertItemAfter = (id: string): void => {
+    const index = items.findIndex((i) => i.id === id);
+    const newItem: ChecklistItem = {
+      id: uuidv4(),
+      text: "",
+      checked: false,
+    };
+    const updated = [...items];
+    updated.splice(index + 1, 0, newItem);
+    pendingFocusId.current = newItem.id;
+    onChange(updated);
+  };
   const removeItem = (id: string): void =>
     onChange(items.filter((i) => i.id !== id));
 
@@ -40,8 +76,15 @@ export function ChecklistNote({
           {isEditMode ? (
             <>
               <input
+                ref={setInputRef(item.id)}
                 value={item.text}
                 onChange={(e) => updateText(item.id, e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    insertItemAfter(item.id);
+                  }
+                }}
                 placeholder="Item..."
                 style={{
                   background: "transparent",

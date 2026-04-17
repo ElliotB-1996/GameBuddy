@@ -1,4 +1,12 @@
-import { app, shell, BrowserWindow, session, Tray, Menu, ipcMain } from "electron";
+import {
+  app,
+  shell,
+  BrowserWindow,
+  session,
+  Tray,
+  Menu,
+  ipcMain,
+} from "electron";
 import { join } from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import { registerNotesHandlers } from "./ipc/notes-handler";

@@ -15,8 +15,7 @@ export function buildTrayMenuItems(
       click: onToggleVisibility,
     },
     {
-      label:
-        mode === "view" ? "Switch to Edit Mode" : "Switch to View Mode",
+      label: mode === "view" ? "Switch to Edit Mode" : "Switch to View Mode",
       click: onToggleMode,
     },
     { type: "separator" },

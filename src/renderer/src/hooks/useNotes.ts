@@ -24,6 +24,7 @@ export interface UseNotesReturn {
     content: Note["content"],
   ) => void;
   deleteNote: (sectionId: string, noteId: string) => void;
+  toggleNoteCollapsed: (sectionId: string, noteId: string) => void;
   updateSettings: (settings: Settings) => void;
   updateAppearance: (appearance: Appearance) => void;
   getAppData: () => AppData;
@@ -111,6 +112,25 @@ export function useNotes(initialData: AppData): UseNotesReturn {
     );
   }, []);
 
+  const toggleNoteCollapsed = useCallback(
+    (sectionId: string, noteId: string) => {
+      setSections((prev) =>
+        prev.map((s) => {
+          if (s.id !== sectionId) return s;
+          return {
+            ...s,
+            notes: s.notes.map((n) =>
+              n.id === noteId
+                ? ({ ...n, collapsed: !(n.collapsed ?? true) } as Note)
+                : n,
+            ),
+          };
+        }),
+      );
+    },
+    [],
+  );
+
   const updateSettings = useCallback((newSettings: Settings) => {
     setSettings(newSettings);
   }, []);
@@ -135,6 +155,7 @@ export function useNotes(initialData: AppData): UseNotesReturn {
     addChecklistNote,
     updateNote,
     deleteNote,
+    toggleNoteCollapsed,
     updateSettings,
     updateAppearance,
     getAppData,

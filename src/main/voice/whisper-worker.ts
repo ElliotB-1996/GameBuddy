@@ -1,7 +1,7 @@
 import { workerData, parentPort } from "worker_threads";
 import Module from "module";
 
-// @xenova/transformers statically imports `sharp` for image processing.
+// @huggingface/transformers statically imports `sharp` for image processing.
 // We only use it for audio (ASR), so stub it out to avoid DLL resolution
 // errors on Windows. The transformers image.js is also patched via
 // scripts/patch-transformers.mjs (run in postinstall) to remove the
@@ -16,7 +16,7 @@ const _originalLoad = (Module as any)._load.bind(Module);
 
 async function run(): Promise<void> {
   try {
-    const { pipeline, env } = await import("@xenova/transformers");
+    const { pipeline, env } = await import("@huggingface/transformers");
 
     env.localModelPath = workerData.modelPath;
     env.allowLocalModels = true;

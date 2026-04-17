@@ -11,7 +11,7 @@ export default defineConfig({
           index: resolve("src/main/index.ts"),
           "whisper-worker": resolve("src/main/voice/whisper-worker.ts"),
         },
-        external: ["@xenova/transformers"],
+        external: ["@huggingface/transformers"],
       },
     },
   },

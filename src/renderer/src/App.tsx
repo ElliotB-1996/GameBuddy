@@ -77,10 +77,14 @@ function NotesApp({
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const activeSectionIdRef = useRef(activeSectionId);
-  activeSectionIdRef.current = activeSectionId;
+  useEffect(() => {
+    activeSectionIdRef.current = activeSectionId;
+  });
 
   const addTextNoteRef = useRef(notes.addTextNote);
-  addTextNoteRef.current = notes.addTextNote;
+  useEffect(() => {
+    addTextNoteRef.current = notes.addTextNote;
+  });
 
   const addToast = useCallback(
     (message: string, type: ToastMessage["type"] = "error") => {
@@ -92,6 +96,24 @@ function NotesApp({
   const dismissToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
+
+  const handleVoiceToggle = useCallback(async () => {
+    const sectionId = activeSectionIdRef.current;
+    if (audioState === "recording") {
+      const buffer = await stopRecording();
+      if (buffer && sectionId) {
+        try {
+          await window.api.transcribeAudio(buffer);
+        } catch (err) {
+          addToast(
+            err instanceof Error ? err.message : "Transcription failed.",
+          );
+        }
+      }
+    } else if (audioState === "idle" && sectionId) {
+      await startRecording(notes.settings.audioDeviceId || undefined);
+    }
+  }, [audioState, startRecording, stopRecording, addToast, notes.settings.audioDeviceId]);
 
   useEffect(() => {
     window.api.onVoiceResult((text, error) => {
@@ -113,15 +135,16 @@ function NotesApp({
     });
 
     window.api.onHotkeyStartVoiceNote(() => {
-      voiceToggleRef.current();
+      handleVoiceToggle();
     });
 
     return () => {
       window.api.removeVoiceAndHotkeyListeners();
     };
-  }, [addToast]);
+  }, [addToast, handleVoiceToggle]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (audioError) addToast(audioError);
   }, [audioError, addToast]);
 
@@ -145,29 +168,6 @@ function NotesApp({
       return next;
     });
   }, []);
-
-  const handleVoiceToggle = useCallback(async () => {
-    const sectionId = activeSectionIdRef.current;
-    if (audioState === "recording") {
-      const buffer = await stopRecording();
-      if (buffer && sectionId) {
-        try {
-          await window.api.transcribeAudio(buffer);
-        } catch (err) {
-          addToast(
-            err instanceof Error ? err.message : "Transcription failed.",
-          );
-        }
-      }
-    } else if (audioState === "idle" && sectionId) {
-      await startRecording(notes.settings.audioDeviceId || undefined);
-    }
-    //todo claude to fix these lint issues
-  }, [audioState, startRecording, stopRecording, addToast]);
-
-  // todo claude this is a bit hacky, can we move this logic into the hook or somewhere else so we don't have to use refs to access the latest values?
-  const voiceToggleRef = useRef(handleVoiceToggle);
-  voiceToggleRef.current = handleVoiceToggle;
 
   const handleSaveSettings = useCallback(
     async (hotkeys: typeof notes.settings.hotkeys, audioDeviceId: string) => {

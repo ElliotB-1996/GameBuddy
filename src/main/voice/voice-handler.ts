@@ -15,6 +15,16 @@ export function registerVoiceHandlers(
   win: BrowserWindow,
   modelPath: string,
 ): void {
+  if (process.env.E2E_MOCK_VOICE === "1") {
+    ipcMain.handle("voice:transcribe", async (_event, audioBuffer: Float32Array) => {
+      const bufferArray = Array.from(audioBuffer);
+      const validationError = validateAudioBuffer(bufferArray);
+      if (validationError) throw new Error(validationError);
+      win.webContents.send("voice:result", "E2E mock transcription");
+    });
+    return;
+  }
+
   ipcMain.handle(
     "voice:transcribe",
     async (_event, audioBuffer: Float32Array) => {

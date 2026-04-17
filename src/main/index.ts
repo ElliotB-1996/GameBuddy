@@ -7,6 +7,10 @@ import {
   Menu,
   ipcMain,
 } from "electron";
+
+if (process.env.E2E_USER_DATA_DIR) {
+  app.setPath("userData", process.env.E2E_USER_DATA_DIR);
+}
 import { join } from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import { registerNotesHandlers } from "./ipc/notes-handler";
@@ -35,7 +39,7 @@ function createWindow(): BrowserWindow {
     },
   });
 
-  if (is.dev) {
+  if (is.dev && !process.env.E2E_NO_TRAY) {
     win.webContents.openDevTools({ mode: "detach" });
   }
   win.setAlwaysOnTop(true, "screen-saver");
@@ -81,47 +85,49 @@ app.whenReady().then(() => {
   mainWindow = createWindow();
 
   // Tray setup
-  let currentMode: TrayMode = "view";
-  const trayIconPath = is.dev
-    ? join(__dirname, "../../resources/tray-icon.png")
-    : join(process.resourcesPath, "tray-icon.png");
-  const tray = new Tray(trayIconPath);
-  tray.setToolTip("Overlay — View Mode");
+  if (!process.env.E2E_NO_TRAY) {
+    let currentMode: TrayMode = "view";
+    const trayIconPath = is.dev
+      ? join(__dirname, "../../resources/tray-icon.png")
+      : join(process.resourcesPath, "tray-icon.png");
+    const tray = new Tray(trayIconPath);
+    tray.setToolTip("Overlay — View Mode");
 
-  function rebuildTrayMenu(): void {
-    tray.setToolTip(
-      `Overlay — ${currentMode === "view" ? "View" : "Edit"} Mode`,
-    );
-    tray.setContextMenu(
-      Menu.buildFromTemplate(
-        buildTrayMenuItems(
-          mainWindow!.isVisible(),
-          currentMode,
-          () => {
-            if (mainWindow!.isVisible()) {
-              mainWindow!.hide();
-            } else {
-              mainWindow!.show();
-            }
-            rebuildTrayMenu();
-          },
-          () => {
-            mainWindow!.webContents.send("hotkey:toggleEditMode");
-          },
-          () => {
-            app.quit();
-          },
+    function rebuildTrayMenu(): void {
+      tray.setToolTip(
+        `Overlay — ${currentMode === "view" ? "View" : "Edit"} Mode`,
+      );
+      tray.setContextMenu(
+        Menu.buildFromTemplate(
+          buildTrayMenuItems(
+            mainWindow!.isVisible(),
+            currentMode,
+            () => {
+              if (mainWindow!.isVisible()) {
+                mainWindow!.hide();
+              } else {
+                mainWindow!.show();
+              }
+              rebuildTrayMenu();
+            },
+            () => {
+              mainWindow!.webContents.send("hotkey:toggleEditMode");
+            },
+            () => {
+              app.quit();
+            },
+          ),
         ),
-      ),
-    );
-  }
+      );
+    }
 
-  rebuildTrayMenu();
-
-  ipcMain.on("window:notifyModeChanged", (_event, mode: TrayMode) => {
-    currentMode = mode;
     rebuildTrayMenu();
-  });
+
+    ipcMain.on("window:notifyModeChanged", (_event, mode: TrayMode) => {
+      currentMode = mode;
+      rebuildTrayMenu();
+    });
+  }
 
   const modelPath = is.dev
     ? join(__dirname, "../../resources/models")

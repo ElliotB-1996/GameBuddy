@@ -8,6 +8,8 @@ Write unit tests for each task as you implement it, but only run the full test s
 
 Always create todo lists to track progress
 
+Run `npm audit` before merging any branch that adds or updates dependencies. If vulnerabilities are found, investigate whether a non-breaking fix exists before reaching for `--force`.
+
 ## Project Overview
 
 **Game Overlay Notes** — An Electron + React + TypeScript desktop app providing an always-on-top transparent overlay for taking notes while gaming. Key features: voice-to-text (Whisper via `@huggingface/transformers`), view/edit modes with distinct mouse event behavior, global hotkeys, system tray integration, and persistent local JSON storage.

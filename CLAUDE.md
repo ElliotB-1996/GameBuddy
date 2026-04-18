@@ -8,9 +8,11 @@ Write unit tests for each task as you implement it, but only run the full test s
 
 Always create todo lists to track progress
 
+Run `npm audit` before merging any branch that adds or updates dependencies. If vulnerabilities are found, investigate whether a non-breaking fix exists before reaching for `--force`.
+
 ## Project Overview
 
-**Game Overlay Notes** — An Electron + React + TypeScript desktop app providing an always-on-top transparent overlay for taking notes while gaming. Key features: voice-to-text (Whisper via `@xenova/transformers`), view/edit modes with distinct mouse event behavior, global hotkeys, system tray integration, and persistent local JSON storage.
+**Game Overlay Notes** — An Electron + React + TypeScript desktop app providing an always-on-top transparent overlay for taking notes while gaming. Key features: voice-to-text (Whisper via `@huggingface/transformers`), view/edit modes with distinct mouse event behavior, global hotkeys, system tray integration, and persistent local JSON storage.
 
 ## Commands
 
@@ -70,7 +72,7 @@ Electron modules are mocked in tests; do not import real `electron` in renderer 
 
 ## Important Constraints
 
-- `@xenova/transformers` is marked external in `electron.vite.config.ts` and loaded at runtime, not bundled. The `postinstall` script patches it for Windows compatibility (see memory for details).
+- `@huggingface/transformers` is marked external in `electron.vite.config.ts` and loaded at runtime, not bundled. The `postinstall` script patches it for Windows compatibility (see memory for details).
 - Whisper model files live in `resources/models/Xenova/whisper-small/` and are unpacked to disk by `electron-builder` (configured in `electron-builder.yml`). The model path is passed from main to the worker thread.
 - Two separate `tsconfig` files: `tsconfig.node.json` (main/preload, Node target) and `tsconfig.web.json` (renderer, browser target). Run the matching typecheck when editing each side.
 - ESLint uses flat config (`eslint.config.mjs`). The `tests/` directory is excluded from linting.

@@ -1,5 +1,5 @@
 /**
- * Patches @xenova/transformers/src/utils/image.js to stub out the static
+ * Patches @huggingface/transformers/src/utils/image.js to stub out the static
  * `import sharp from 'sharp'` line. The file already guards all sharp usage
  * behind `if (sharp)` checks, so setting it to null is safe for audio-only
  * pipelines. This avoids DLL resolution errors on Windows where sharp is
@@ -17,7 +17,7 @@ const imagePath = join(
   __dirname,
   "..",
   "node_modules",
-  "@xenova",
+  "@huggingface",
   "transformers",
   "src",
   "utils",

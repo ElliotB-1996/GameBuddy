@@ -39,9 +39,6 @@ function createWindow(): BrowserWindow {
     },
   });
 
-  if (is.dev && !process.env.E2E_NO_TRAY) {
-    win.webContents.openDevTools({ mode: "detach" });
-  }
   win.setAlwaysOnTop(true, "screen-saver");
 
   win.setIgnoreMouseEvents(true, { forward: true });

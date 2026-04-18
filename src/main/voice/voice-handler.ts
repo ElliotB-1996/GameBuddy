@@ -16,12 +16,15 @@ export function registerVoiceHandlers(
   modelPath: string,
 ): void {
   if (process.env.E2E_MOCK_VOICE === "1") {
-    ipcMain.handle("voice:transcribe", async (_event, audioBuffer: Float32Array) => {
-      const bufferArray = Array.from(audioBuffer);
-      const validationError = validateAudioBuffer(bufferArray);
-      if (validationError) throw new Error(validationError);
-      win.webContents.send("voice:result", "E2E mock transcription");
-    });
+    ipcMain.handle(
+      "voice:transcribe",
+      async (_event, audioBuffer: Float32Array) => {
+        const bufferArray = Array.from(audioBuffer);
+        const validationError = validateAudioBuffer(bufferArray);
+        if (validationError) throw new Error(validationError);
+        win.webContents.send("voice:result", "E2E mock transcription");
+      },
+    );
     return;
   }
 
@@ -40,6 +43,8 @@ export function registerVoiceHandlers(
         const worker = new Worker(workerPath, {
           workerData: { audioBuffer: bufferArray, modelPath },
         });
+        const log = process.env.VOICE_DEBUG === "1" ? console.error : () => {};
+
         worker.on(
           "message",
           (msg: { type: string; text?: string; message?: string }) => {
@@ -47,7 +52,7 @@ export function registerVoiceHandlers(
               win.webContents.send("voice:result", msg.text);
               resolve();
             } else if (msg.type === "error") {
-              console.error("[voice] worker error:", msg.message);
+              log("[voice] worker error:", msg.message);
               win.webContents.send("voice:result", null, msg.message);
               resolve();
             }
@@ -55,7 +60,7 @@ export function registerVoiceHandlers(
         );
 
         worker.on("error", (err) => {
-          console.error("[voice] worker threw:", err);
+          log("[voice] worker threw:", err);
           win.webContents.send("voice:result", null, err.message);
           resolve();
         });

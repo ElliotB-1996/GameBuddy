@@ -113,7 +113,13 @@ function NotesApp({
     } else if (audioState === "idle" && sectionId) {
       await startRecording(notes.settings.audioDeviceId || undefined);
     }
-  }, [audioState, startRecording, stopRecording, addToast, notes.settings.audioDeviceId]);
+  }, [
+    audioState,
+    startRecording,
+    stopRecording,
+    addToast,
+    notes.settings.audioDeviceId,
+  ]);
 
   useEffect(() => {
     window.api.onVoiceResult((text, error) => {

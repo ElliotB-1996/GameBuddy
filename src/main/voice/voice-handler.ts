@@ -47,6 +47,7 @@ export function registerVoiceHandlers(
               win.webContents.send("voice:result", msg.text);
               resolve();
             } else if (msg.type === "error") {
+              console.error("[voice] worker error:", msg.message);
               win.webContents.send("voice:result", null, msg.message);
               resolve();
             }
@@ -54,6 +55,7 @@ export function registerVoiceHandlers(
         );
 
         worker.on("error", (err) => {
+          console.error("[voice] worker threw:", err);
           win.webContents.send("voice:result", null, err.message);
           resolve();
         });

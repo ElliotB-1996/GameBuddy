@@ -12,7 +12,7 @@ import { mkdirSync, createWriteStream, existsSync } from "fs";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const modelDir = join(__dirname, "..", "resources", "models");
 
-// Files required by @xenova/transformers for Xenova/whisper-small ASR
+// Files required by @huggingface/transformers for Xenova/whisper-small ASR
 const MODEL_ID = "Xenova/whisper-small";
 const BASE_URL = `https://huggingface.co/${MODEL_ID}/resolve/main`;
 

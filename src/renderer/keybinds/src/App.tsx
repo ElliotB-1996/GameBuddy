@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
+import './index.css'
 import { profiles } from './data/profiles'
 import type { Zone, Profile } from './data/types'
 import Legend from './components/Legend'

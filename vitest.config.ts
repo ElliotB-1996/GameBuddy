@@ -11,6 +11,7 @@ export default defineConfig({
     include: ["tests/**/*.test.{ts,tsx}"],
     alias: {
       "@renderer": resolve(__dirname, "src/renderer/src"),
+      "@keybinds": resolve(__dirname, "src/renderer/keybinds/src"),
     },
   },
 });

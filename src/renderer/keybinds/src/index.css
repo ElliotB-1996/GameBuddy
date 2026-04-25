@@ -9,7 +9,8 @@ body {
 }
 
 /* ── Header / Tabs ── */
-.header { padding: 14px 20px 0; border-bottom: 1px solid #1e1b4b; }
+.header { padding: 14px 20px 0; border-bottom: 1px solid #1e1b4b; -webkit-app-region: drag; }
+.profile-tabs, .profile-tabs button, .profile-tabs input { -webkit-app-region: no-drag; }
 .header h1 { font-size: 15px; font-weight: 700; color: #a78bfa; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
 .profile-tabs { display: flex; gap: 2px; overflow-x: auto; }
 .tab { padding: 7px 14px; border-radius: 6px 6px 0 0; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; border: 1px solid transparent; border-bottom: none; background: none; color: #64748b; }
@@ -43,6 +44,11 @@ body {
 
 /* ── Device panel ── */
 .device-panel { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; }
+
+@media (max-width: 700px) {
+  .device-panel { grid-template-columns: 1fr; }
+  .right-col { flex-direction: row; flex-wrap: wrap; }
+}
 .device-section { background: #0d0d1a; border: 1px solid #1e1b4b; border-radius: 8px; padding: 14px; }
 .device-section.column { display: flex; flex-direction: column; }
 .device-header { display: flex; align-items: center; margin-bottom: 12px; }

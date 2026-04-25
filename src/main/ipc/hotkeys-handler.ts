@@ -41,9 +41,12 @@ export function registerGlobalHotkeys(
   unregisterGlobalHotkeys();
 
   const register = (key: string, fn: () => void): boolean => {
-    if (!key) return false;
-    if (validateAccelerator(key) !== null) return false;
-    return globalShortcut.register(buildAccelerator(key), fn);
+    if (!key) { console.log(`[hotkeys] skipped empty key`); return false; }
+    const err = validateAccelerator(key);
+    if (err !== null) { console.log(`[hotkeys] invalid accelerator "${key}": ${err}`); return false; }
+    const ok = globalShortcut.register(buildAccelerator(key), fn);
+    console.log(`[hotkeys] register "${key}" →`, ok ? "ok" : "FAILED (already taken by another app?)");
+    return ok;
   };
 
   register(hotkeys.toggleVisibility, () => {
@@ -60,6 +63,7 @@ export function registerGlobalHotkeys(
   });
 
   register(hotkeys.toggleKeybinds, () => {
+    console.log(`[hotkeys] toggleKeybinds fired, isVisible=${keybindsWin.isVisible()}`);
     if (keybindsWin.isVisible()) keybindsWin.hide();
     else keybindsWin.show();
   });

@@ -76,7 +76,7 @@ function createKeybindsWindow(): BrowserWindow {
   });
 
   if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
-    win.loadURL(process.env["ELECTRON_RENDERER_URL"] + "/keybinds.html");
+    win.loadURL(process.env["ELECTRON_RENDERER_URL"] + "/keybinds/index.html");
   } else {
     win.loadFile(join(__dirname, "../renderer/keybinds.html"));
   }

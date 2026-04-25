@@ -1,16 +1,11 @@
 import {
-  app,
-  shell,
-  BrowserWindow,
-  session,
-  Tray,
-  Menu,
-  ipcMain,
+  app, shell, BrowserWindow, session, Tray, Menu, ipcMain,
 } from "electron";
 
 if (process.env.E2E_USER_DATA_DIR) {
   app.setPath("userData", process.env.E2E_USER_DATA_DIR);
 }
+
 import { join } from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import { registerNotesHandlers } from "./ipc/notes-handler";
@@ -20,12 +15,14 @@ import {
   registerGlobalHotkeys,
   unregisterGlobalHotkeys,
 } from "./ipc/hotkeys-handler";
+import { registerKeybindsHandlers } from "./ipc/keybinds-handler";
 import { registerVoiceHandlers } from "./voice/voice-handler";
 import { buildTrayMenuItems, type TrayMode } from "./tray-menu";
 
-let mainWindow: BrowserWindow | null = null;
+let notesWindow: BrowserWindow | null = null;
+let keybindsWindow: BrowserWindow | null = null;
 
-function createWindow(): BrowserWindow {
+function createNotesWindow(): BrowserWindow {
   const win = new BrowserWindow({
     width: 420,
     height: 680,
@@ -40,7 +37,6 @@ function createWindow(): BrowserWindow {
   });
 
   win.setAlwaysOnTop(true, "screen-saver");
-
   win.setIgnoreMouseEvents(true, { forward: true });
 
   win.webContents.setWindowOpenHandler((details) => {
@@ -57,6 +53,37 @@ function createWindow(): BrowserWindow {
   return win;
 }
 
+function createKeybindsWindow(): BrowserWindow {
+  const win = new BrowserWindow({
+    width: 1100,
+    height: 700,
+    frame: false,
+    transparent: true,
+    skipTaskbar: true,
+    resizable: true,
+    show: false,
+    webPreferences: {
+      preload: join(__dirname, "../preload/keybinds.js"),
+      sandbox: false,
+    },
+  });
+
+  win.setAlwaysOnTop(true, "screen-saver");
+
+  win.webContents.setWindowOpenHandler((details) => {
+    shell.openExternal(details.url);
+    return { action: "deny" };
+  });
+
+  if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
+    win.loadURL(process.env["ELECTRON_RENDERER_URL"] + "/keybinds.html");
+  } else {
+    win.loadFile(join(__dirname, "../renderer/keybinds.html"));
+  }
+
+  return win;
+}
+
 app.whenReady().then(() => {
   electronApp.setAppUserModelId("com.gameoverlay.notes");
 
@@ -64,9 +91,7 @@ app.whenReady().then(() => {
     (_webContents, permission, callback, details) => {
       if (
         permission === "media" &&
-        (details as Electron.MediaAccessPermissionRequest).mediaTypes?.includes(
-          "audio",
-        )
+        (details as Electron.MediaAccessPermissionRequest).mediaTypes?.includes("audio")
       ) {
         callback(true);
       } else {
@@ -79,7 +104,8 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window);
   });
 
-  mainWindow = createWindow();
+  notesWindow = createNotesWindow();
+  keybindsWindow = createKeybindsWindow();
 
   // Tray setup
   if (!process.env.E2E_NO_TRAY) {
@@ -88,7 +114,6 @@ app.whenReady().then(() => {
       ? join(__dirname, "../../resources/tray-icon.png")
       : join(process.resourcesPath, "tray-icon.png");
     const tray = new Tray(trayIconPath);
-    tray.setToolTip("Overlay — View Mode");
 
     function rebuildTrayMenu(): void {
       tray.setToolTip(
@@ -97,22 +122,23 @@ app.whenReady().then(() => {
       tray.setContextMenu(
         Menu.buildFromTemplate(
           buildTrayMenuItems(
-            mainWindow!.isVisible(),
+            notesWindow!.isVisible(),
             currentMode,
+            keybindsWindow!.isVisible(),
             () => {
-              if (mainWindow!.isVisible()) {
-                mainWindow!.hide();
-              } else {
-                mainWindow!.show();
-              }
+              if (notesWindow!.isVisible()) notesWindow!.hide();
+              else notesWindow!.show();
               rebuildTrayMenu();
             },
             () => {
-              mainWindow!.webContents.send("hotkey:toggleEditMode");
+              notesWindow!.webContents.send("hotkey:toggleEditMode");
             },
             () => {
-              app.quit();
+              if (keybindsWindow!.isVisible()) keybindsWindow!.hide();
+              else keybindsWindow!.show();
+              rebuildTrayMenu();
             },
+            () => { app.quit(); },
           ),
         ),
       );
@@ -131,19 +157,26 @@ app.whenReady().then(() => {
     : join(process.resourcesPath, "models");
 
   const { initialData, loadError } = registerNotesHandlers();
-  registerWindowHandlers(mainWindow);
-  registerHotkeyHandlers(mainWindow);
-  registerVoiceHandlers(mainWindow, modelPath);
+  const { initialProfiles } = registerKeybindsHandlers(keybindsWindow);
 
-  mainWindow.webContents.on("did-finish-load", () => {
-    mainWindow!.webContents.send("notes:load", initialData, loadError);
+  registerWindowHandlers(notesWindow);
+  registerHotkeyHandlers(notesWindow, keybindsWindow);
+  registerVoiceHandlers(notesWindow, modelPath);
+
+  notesWindow.webContents.on("did-finish-load", () => {
+    notesWindow!.webContents.send("notes:load", initialData, loadError);
   });
 
-  registerGlobalHotkeys(mainWindow, initialData.settings.hotkeys);
+  keybindsWindow.webContents.on("did-finish-load", () => {
+    keybindsWindow!.webContents.send("keybinds:load", initialProfiles);
+  });
+
+  registerGlobalHotkeys(notesWindow, keybindsWindow, initialData.settings.hotkeys);
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      mainWindow = createWindow();
+      notesWindow = createNotesWindow();
+      keybindsWindow = createKeybindsWindow();
     }
   });
 });

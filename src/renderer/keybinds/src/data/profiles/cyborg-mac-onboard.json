@@ -1,0 +1,42 @@
+{
+  "id": "cyborg-mac-onboard",
+  "label": "Mac Default",
+  "platform": "mac",
+  "type": "azeron",
+  "device": "cyborg",
+  "layers": {
+    "default": {
+      "1":  { "zone": "terminal", "label": "Toggle Term",  "bindings": { "single": "Ctrl+`" } },
+      "2":  { "zone": "terminal", "label": "New Tab",      "bindings": { "single": "—" } },
+      "3":  { "zone": "terminal", "label": "iTerm Tab",    "bindings": { "single": "Cmd+T" } },
+      "4":  { "zone": "app",      "label": "VS Code",      "bindings": { "single": "Ctrl+Alt+V" } },
+      "5":  { "zone": "edit",     "label": "Find",         "bindings": { "single": "Cmd+F" } },
+      "6":  { "zone": "edit",     "label": "Find Files",   "bindings": { "single": "Cmd+Shift+F" } },
+      "7":  { "zone": "edit",     "label": "Comment",      "bindings": { "single": "Cmd+/" } },
+      "8":  { "zone": "app",      "label": "Terminal",     "bindings": { "single": "Ctrl+Alt+T" } },
+      "9":  { "zone": "edit",     "label": "Format",       "bindings": { "single": "Cmd+Shift+I" } },
+      "10": { "zone": "edit",     "label": "Dup Line",     "bindings": { "single": "Cmd+Shift+D" } },
+      "11": { "zone": "edit",     "label": "Del Line",     "bindings": { "single": "Cmd+Shift+K" } },
+      "12": { "zone": "app",      "label": "Browser",      "bindings": { "single": "Ctrl+Alt+B" } },
+      "13": { "zone": "git",      "label": "Branch",       "bindings": { "single": "Ctrl+Shift+Alt+B" } },
+      "14": { "zone": "nav",      "label": "Go Def",       "bindings": { "single": "F12" } },
+      "15": { "zone": "nav",      "label": "Go Back",      "bindings": { "single": "Ctrl+-" } },
+      "16": { "zone": "nav",      "label": "References",   "bindings": { "single": "Shift+F12" } },
+      "17": { "zone": "app",      "label": "Claude",       "bindings": { "single": "Ctrl+Alt+C" } },
+      "18": { "zone": "git",      "label": "Stash",        "bindings": { "single": "Ctrl+Shift+Alt+H" } },
+      "19": { "zone": "nav",      "label": "Rename",       "bindings": { "single": "F2" } },
+      "20": { "zone": "app",      "label": "Azeron",       "bindings": { "single": "Ctrl+Alt+A" } },
+      "22": { "zone": "git",      "label": "Source Ctrl",  "bindings": { "single": "Ctrl+Shift+Alt+G" } },
+      "23": { "zone": "app",      "label": "PowerToys",    "bindings": { "single": "Win+Shift+Q" } },
+      "24": { "zone": "system",   "label": "Joystick",     "bindings": { "single": "Arrow Keys (8-dir)" } },
+      "28": { "zone": "git",      "label": "Push",         "bindings": { "single": "Ctrl+Shift+Alt+U" } },
+      "29": { "zone": "nav",      "label": "Prev Tab",     "bindings": { "single": "Ctrl+PageUp" } },
+      "30": { "zone": "git",      "label": "Pull",         "bindings": { "single": "Ctrl+Shift+Alt+P" } },
+      "31": { "zone": "nav",      "label": "Next Tab",     "bindings": { "single": "Ctrl+PageDown" } },
+      "36": { "zone": "terminal", "label": "Prev Cmd",     "bindings": { "single": "↑" } },
+      "37": { "zone": "thumb",    "label": "Esc",          "bindings": { "single": "Escape" } },
+      "38": { "zone": "git",      "label": "Stage All",    "bindings": { "single": "Ctrl+Shift+Alt+S" } },
+      "41": { "zone": "app",      "label": "ReWASD",       "bindings": { "single": "Ctrl+Alt+R" } }
+    }
+  }
+}

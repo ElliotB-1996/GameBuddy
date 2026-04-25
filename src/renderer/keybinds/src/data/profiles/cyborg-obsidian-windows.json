@@ -1,0 +1,46 @@
+{
+  "id": "cyborg-obsidian-windows",
+  "label": "Obsidian",
+  "platform": "windows",
+  "type": "rewasd",
+  "device": "cyborg",
+  "layers": {
+    "default": {
+      "1":  { "zone": "edit",    "label": "Toggle Edit",   "bindings": { "single": "Ctrl+E" } },
+      "2":  { "zone": "edit",    "label": "New Note",      "bindings": { "single": "Ctrl+N" } },
+      "3":  { "zone": "edit",    "label": "Daily Note",    "bindings": { "single": "Ctrl+Shift+D" } },
+      "4":  { "zone": "app",     "label": "VS Code",       "bindings": { "single": "Ctrl+Alt+V" } },
+      "5":  { "zone": "nav",     "label": "Search",        "bindings": { "single": "Ctrl+F" } },
+      "6":  { "zone": "nav",     "label": "Search Vault",  "bindings": { "single": "Ctrl+Shift+F" } },
+      "7":  { "zone": "edit",    "label": "Bold",          "bindings": { "single": "Ctrl+B" } },
+      "8":  { "zone": "app",     "label": "Terminal",      "bindings": { "single": "Ctrl+Alt+T" } },
+      "9":  { "zone": "edit",    "label": "Italic",        "bindings": { "single": "Ctrl+I" } },
+      "10": { "zone": "edit",    "label": "Strikethrough", "bindings": { "single": "Ctrl+Shift+S" } },
+      "11": { "zone": "edit",    "label": "Code Block",    "bindings": { "single": "Ctrl+Shift+`" } },
+      "12": { "zone": "app",     "label": "Browser",       "bindings": { "single": "Ctrl+Alt+B" } },
+      "13": { "zone": "nav",     "label": "Quick Switch",  "bindings": { "single": "Ctrl+O" } },
+      "14": { "zone": "nav",     "label": "Back",          "bindings": { "single": "Alt+Left" } },
+      "15": { "zone": "nav",     "label": "Forward",       "bindings": { "single": "Alt+Right" } },
+      "16": { "zone": "nav",     "label": "Graph View",    "bindings": { "single": "Ctrl+G" } },
+      "17": { "zone": "app",     "label": "Claude",        "bindings": { "single": "Ctrl+Alt+C" } },
+      "18": { "zone": "edit",    "label": "Insert Link",   "bindings": { "single": "Ctrl+K" } },
+      "19": { "zone": "edit",    "label": "Insert Tmpl",   "bindings": { "single": "Ctrl+Shift+T" } },
+      "20": { "zone": "app",     "label": "Azeron",        "bindings": { "single": "Ctrl+Alt+A" } },
+      "22": { "zone": "nav",     "label": "Cmd Palette",   "bindings": { "single": "Ctrl+P" } },
+      "23": { "zone": "app",     "label": "PowerToys",     "bindings": { "single": "Win+Shift+Q" } },
+      "28": { "zone": "nav",     "label": "Fold All",      "bindings": { "single": "Ctrl+Shift+[" } },
+      "29": { "zone": "nav",     "label": "Prev Tab",      "bindings": { "single": "Ctrl+PageUp" } },
+      "30": { "zone": "nav",     "label": "Unfold All",    "bindings": { "single": "Ctrl+Shift+]" } },
+      "31": { "zone": "nav",     "label": "Next Tab",      "bindings": { "single": "Ctrl+PageDown" } },
+      "36": { "zone": "nav",     "label": "Scroll Up",     "bindings": { "single": "↑" } },
+      "37": { "zone": "thumb",   "label": "Esc",           "bindings": { "single": "Escape" } },
+      "38": { "zone": "nav",     "label": "Close Tab",     "bindings": { "single": "Ctrl+W" } },
+      "41": { "zone": "app",     "label": "ReWASD",        "bindings": { "single": "Ctrl+Alt+R" } }
+    }
+  },
+  "_notes": {
+    "daily_note": "Ctrl+Shift+D requires the Daily Notes core plugin to be enabled in Obsidian.",
+    "insert_template": "Ctrl+Shift+T requires the Templates or Templater community plugin. Shortcut may need to be configured in Obsidian hotkeys if conflicting.",
+    "fold_unfold": "Ctrl+Shift+[ and Ctrl+Shift+] are Obsidian's default fold/unfold shortcuts for the current heading. Verify these are set in Obsidian hotkeys settings."
+  }
+}

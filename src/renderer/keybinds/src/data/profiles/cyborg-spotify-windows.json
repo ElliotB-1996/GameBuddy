@@ -1,0 +1,46 @@
+{
+  "id": "cyborg-spotify-windows",
+  "label": "Spotify",
+  "platform": "windows",
+  "type": "rewasd",
+  "device": "cyborg",
+  "layers": {
+    "default": {
+      "1":  { "zone": "system",  "label": "Play/Pause",   "bindings": { "single": "Ctrl+Space" } },
+      "2":  { "zone": "system",  "label": "Next Track",   "bindings": { "single": "Ctrl+Right" } },
+      "3":  { "zone": "system",  "label": "Prev Track",   "bindings": { "single": "Ctrl+Left" } },
+      "4":  { "zone": "app",     "label": "VS Code",      "bindings": { "single": "Ctrl+Alt+V" } },
+      "5":  { "zone": "nav",     "label": "Find",         "bindings": { "single": "Ctrl+F" } },
+      "6":  { "zone": "nav",     "label": "Search",       "bindings": { "single": "Ctrl+L" } },
+      "7":  { "zone": "system",  "label": "Like Track",   "bindings": { "single": "Ctrl+Shift+B" } },
+      "8":  { "zone": "app",     "label": "Terminal",     "bindings": { "single": "Ctrl+Alt+T" } },
+      "9":  { "zone": "system",  "label": "Vol Up",       "bindings": { "single": "Ctrl+Up" } },
+      "10": { "zone": "system",  "label": "Vol Down",     "bindings": { "single": "Ctrl+Down" } },
+      "11": { "zone": "system",  "label": "Mute",         "bindings": { "single": "Ctrl+Shift+Down" } },
+      "12": { "zone": "app",     "label": "Browser",      "bindings": { "single": "Ctrl+Alt+B" } },
+      "13": { "zone": "system",  "label": "Shuffle",      "bindings": { "single": "Ctrl+S" } },
+      "14": { "zone": "nav",     "label": "Back",         "bindings": { "single": "Alt+Left" } },
+      "15": { "zone": "nav",     "label": "Forward",      "bindings": { "single": "Alt+Right" } },
+      "16": { "zone": "system",  "label": "Repeat",       "bindings": { "single": "Ctrl+R" } },
+      "17": { "zone": "app",     "label": "Claude",       "bindings": { "single": "Ctrl+Alt+C" } },
+      "18": { "zone": "nav",     "label": "Home",         "bindings": { "single": "Alt+Home" } },
+      "19": { "zone": "nav",     "label": "Queue",        "bindings": { "single": "Ctrl+Q" } },
+      "20": { "zone": "app",     "label": "Azeron",       "bindings": { "single": "Ctrl+Alt+A" } },
+      "22": { "zone": "nav",     "label": "Library",      "bindings": { "single": "Ctrl+Shift+L" } },
+      "23": { "zone": "app",     "label": "PowerToys",    "bindings": { "single": "Win+Shift+Q" } },
+      "28": { "zone": "nav",     "label": "Liked Songs",  "bindings": { "single": "Ctrl+Shift+S" } },
+      "29": { "zone": "nav",     "label": "Prev Tab",     "bindings": { "single": "Ctrl+Shift+Tab" } },
+      "30": { "zone": "nav",     "label": "New Playlist", "bindings": { "single": "Ctrl+N" } },
+      "31": { "zone": "nav",     "label": "Next Tab",     "bindings": { "single": "Ctrl+Tab" } },
+      "36": { "zone": "system",  "label": "Vol Up",       "bindings": { "single": "Ctrl+Up" } },
+      "37": { "zone": "thumb",   "label": "Esc",          "bindings": { "single": "Escape" } },
+      "38": { "zone": "nav",     "label": "Close",        "bindings": { "single": "Ctrl+W" } },
+      "41": { "zone": "app",     "label": "ReWASD",       "bindings": { "single": "Ctrl+Alt+R" } }
+    }
+  },
+  "_notes": {
+    "media_keys": "Spotify responds to media keys (Play/Pause, Next, Prev) globally — these can optionally replace Ctrl+Space etc. if ReWASD supports media key output.",
+    "shuffle_repeat": "Ctrl+S and Ctrl+R are Spotify's in-app shortcuts but only work when Spotify window is focused. ReWASD profile guarantees focus context.",
+    "shared_profile": "Discord and Spotify are separate ReWASD profiles but are assigned to discord.exe and spotify.exe respectively. They share a similar Cyborg layout philosophy."
+  }
+}

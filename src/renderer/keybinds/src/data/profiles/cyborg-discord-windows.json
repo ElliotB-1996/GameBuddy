@@ -1,0 +1,46 @@
+{
+  "id": "cyborg-discord-windows",
+  "label": "Discord",
+  "platform": "windows",
+  "type": "rewasd",
+  "device": "cyborg",
+  "layers": {
+    "default": {
+      "1":  { "zone": "system",  "label": "Mute",          "bindings": { "single": "Ctrl+Shift+M" } },
+      "2":  { "zone": "system",  "label": "Deafen",        "bindings": { "single": "Ctrl+Shift+D" } },
+      "3":  { "zone": "nav",     "label": "Mark Read",     "bindings": { "single": "Escape" } },
+      "4":  { "zone": "app",     "label": "VS Code",       "bindings": { "single": "Ctrl+Alt+V" } },
+      "5":  { "zone": "nav",     "label": "Find",          "bindings": { "single": "Ctrl+F" } },
+      "6":  { "zone": "nav",     "label": "Quick Switch",  "bindings": { "single": "Ctrl+K" } },
+      "7":  { "zone": "system",  "label": "Push to Talk",  "bindings": { "single": "—" } },
+      "8":  { "zone": "app",     "label": "Terminal",      "bindings": { "single": "Ctrl+Alt+T" } },
+      "9":  { "zone": "nav",     "label": "Next Unread",   "bindings": { "single": "Alt+Shift+Down" } },
+      "10": { "zone": "nav",     "label": "Prev Unread",   "bindings": { "single": "Alt+Shift+Up" } },
+      "11": { "zone": "nav",     "label": "Next Channel",  "bindings": { "single": "Alt+Down" } },
+      "12": { "zone": "app",     "label": "Browser",       "bindings": { "single": "Ctrl+Alt+B" } },
+      "13": { "zone": "nav",     "label": "Prev Channel",  "bindings": { "single": "Alt+Up" } },
+      "14": { "zone": "nav",     "label": "Back",          "bindings": { "single": "Alt+Left" } },
+      "15": { "zone": "nav",     "label": "Forward",       "bindings": { "single": "Alt+Right" } },
+      "16": { "zone": "system",  "label": "Screen Share",  "bindings": { "single": "Ctrl+Shift+H" } },
+      "17": { "zone": "app",     "label": "Claude",        "bindings": { "single": "Ctrl+Alt+C" } },
+      "18": { "zone": "nav",     "label": "Inbox",         "bindings": { "single": "Ctrl+Shift+I" } },
+      "19": { "zone": "nav",     "label": "Mentions",      "bindings": { "single": "Ctrl+Shift+M" } },
+      "20": { "zone": "app",     "label": "Azeron",        "bindings": { "single": "Ctrl+Alt+A" } },
+      "22": { "zone": "nav",     "label": "Settings",      "bindings": { "single": "Ctrl+Comma" } },
+      "23": { "zone": "app",     "label": "PowerToys",     "bindings": { "single": "Win+Shift+Q" } },
+      "28": { "zone": "system",  "label": "Leave Voice",   "bindings": { "single": "Ctrl+Shift+D" } },
+      "29": { "zone": "nav",     "label": "Prev Server",   "bindings": { "single": "Ctrl+Alt+Up" } },
+      "30": { "zone": "system",  "label": "Join Voice",    "bindings": { "single": "—" } },
+      "31": { "zone": "nav",     "label": "Next Server",   "bindings": { "single": "Ctrl+Alt+Down" } },
+      "36": { "zone": "nav",     "label": "Scroll Up",     "bindings": { "single": "↑" } },
+      "37": { "zone": "thumb",   "label": "Esc",           "bindings": { "single": "Escape" } },
+      "38": { "zone": "nav",     "label": "Emoji Picker",  "bindings": { "single": "Ctrl+E" } },
+      "41": { "zone": "app",     "label": "ReWASD",        "bindings": { "single": "Ctrl+Alt+R" } }
+    }
+  },
+  "_notes": {
+    "push_to_talk": "Button 7 binding should be set to your Discord PTT key in ReWASD, matching whatever is configured in Discord settings.",
+    "join_voice": "Button 30 has no universal shortcut — Discord doesn't have a keyboard shortcut to join a specific channel. Map to a macro or leave unbound.",
+    "mute_deafen": "Ctrl+Shift+M and Ctrl+Shift+D are Discord's default global shortcuts — these must be configured in Discord Settings > Keybinds."
+  }
+}

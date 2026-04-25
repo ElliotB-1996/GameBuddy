@@ -1,0 +1,41 @@
+{
+  "id": "cyborg-browser-windows",
+  "label": "Browser",
+  "platform": "windows",
+  "type": "rewasd",
+  "device": "cyborg",
+  "layers": {
+    "default": {
+      "1":  { "zone": "nav",     "label": "Back",         "bindings": { "single": "Alt+Left" } },
+      "2":  { "zone": "nav",     "label": "Forward",      "bindings": { "single": "Alt+Right" } },
+      "3":  { "zone": "nav",     "label": "Refresh",      "bindings": { "single": "Ctrl+R" } },
+      "4":  { "zone": "app",     "label": "VS Code",      "bindings": { "single": "Ctrl+Alt+V" } },
+      "5":  { "zone": "nav",     "label": "Find",         "bindings": { "single": "Ctrl+F" } },
+      "6":  { "zone": "nav",     "label": "Address Bar",  "bindings": { "single": "Ctrl+L" } },
+      "7":  { "zone": "nav",     "label": "Hard Reload",  "bindings": { "single": "Ctrl+Shift+R" } },
+      "8":  { "zone": "app",     "label": "Terminal",     "bindings": { "single": "Ctrl+Alt+T" } },
+      "9":  { "zone": "nav",     "label": "New Tab",      "bindings": { "single": "Ctrl+T" } },
+      "10": { "zone": "nav",     "label": "Close Tab",    "bindings": { "single": "Ctrl+W" } },
+      "11": { "zone": "nav",     "label": "Reopen Tab",   "bindings": { "single": "Ctrl+Shift+T" } },
+      "12": { "zone": "app",     "label": "Browser",      "bindings": { "single": "Ctrl+Alt+B" } },
+      "13": { "zone": "nav",     "label": "New Window",   "bindings": { "single": "Ctrl+N" } },
+      "14": { "zone": "nav",     "label": "Dev Tools",    "bindings": { "single": "F12" } },
+      "15": { "zone": "nav",     "label": "Inspect",      "bindings": { "single": "Ctrl+Shift+I" } },
+      "16": { "zone": "nav",     "label": "Console",      "bindings": { "single": "Ctrl+Shift+J" } },
+      "17": { "zone": "app",     "label": "Claude",       "bindings": { "single": "Ctrl+Alt+C" } },
+      "18": { "zone": "nav",     "label": "Bookmark",     "bindings": { "single": "Ctrl+D" } },
+      "19": { "zone": "nav",     "label": "Reading Mode",  "bindings": { "single": "Ctrl+Shift+R" } },
+      "20": { "zone": "app",     "label": "Azeron",       "bindings": { "single": "Ctrl+Alt+A" } },
+      "22": { "zone": "nav",     "label": "Zoom Reset",   "bindings": { "single": "Ctrl+0" } },
+      "23": { "zone": "app",     "label": "PowerToys",    "bindings": { "single": "Win+Shift+Q" } },
+      "28": { "zone": "nav",     "label": "Downloads",    "bindings": { "single": "Ctrl+Shift+J" } },
+      "29": { "zone": "nav",     "label": "Prev Tab",     "bindings": { "single": "Ctrl+Shift+Tab" } },
+      "30": { "zone": "nav",     "label": "History",      "bindings": { "single": "Ctrl+H" } },
+      "31": { "zone": "nav",     "label": "Next Tab",     "bindings": { "single": "Ctrl+Tab" } },
+      "36": { "zone": "nav",     "label": "Scroll Up",    "bindings": { "single": "↑" } },
+      "37": { "zone": "thumb",   "label": "Esc",          "bindings": { "single": "Escape" } },
+      "38": { "zone": "nav",     "label": "Full Screen",  "bindings": { "single": "F11" } },
+      "41": { "zone": "app",     "label": "ReWASD",       "bindings": { "single": "Ctrl+Alt+R" } }
+    }
+  }
+}

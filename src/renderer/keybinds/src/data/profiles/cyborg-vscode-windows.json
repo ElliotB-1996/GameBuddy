@@ -1,0 +1,69 @@
+{
+  "id": "cyborg-vscode-windows",
+  "label": "VS Code",
+  "platform": "windows",
+  "type": "rewasd",
+  "device": "cyborg",
+  "layers": {
+    "default": {
+      "1":  { "zone": "terminal", "label": "Toggle ⌃`",  "bindings": { "single": "Ctrl+`" } },
+      "2":  { "zone": "terminal", "label": "New Tab",     "bindings": { "single": "—" } },
+      "3":  { "zone": "terminal", "label": "iTerm Tab",   "bindings": { "single": "Ctrl+T" } },
+      "4":  { "zone": "app",      "label": "VS Code",     "bindings": { "single": "Ctrl+Alt+V" } },
+      "5":  { "zone": "edit",     "label": "Find",        "bindings": { "single": "Ctrl+F" } },
+      "6":  { "zone": "edit",     "label": "Find Files",  "bindings": { "single": "Ctrl+Shift+F" } },
+      "7":  { "zone": "edit",     "label": "Comment",     "bindings": { "single": "Ctrl+/" } },
+      "8":  { "zone": "app",      "label": "Terminal",    "bindings": { "single": "Ctrl+Alt+T" } },
+      "9":  { "zone": "edit",     "label": "Format",      "bindings": { "single": "Ctrl+Shift+I" } },
+      "10": { "zone": "edit",     "label": "Dup Line",    "bindings": { "single": "Ctrl+Shift+D" } },
+      "11": { "zone": "edit",     "label": "Del Line",    "bindings": { "single": "Ctrl+Shift+K" } },
+      "12": { "zone": "app",      "label": "Browser",     "bindings": { "single": "Ctrl+Alt+B" } },
+      "13": { "zone": "nav",      "label": "Explorer",    "bindings": { "single": "Ctrl+Shift+E" } },
+      "14": { "zone": "nav",      "label": "Go Def",      "bindings": { "single": "F12" } },
+      "15": { "zone": "nav",      "label": "Go Back",     "bindings": { "single": "Alt+Left" } },
+      "16": { "zone": "nav",      "label": "References",  "bindings": { "single": "Shift+F12" } },
+      "17": { "zone": "app",      "label": "Claude",      "bindings": { "single": "Ctrl+Alt+C" } },
+      "18": { "zone": "edit",     "label": "New File",    "bindings": { "single": "Ctrl+N" } },
+      "19": { "zone": "nav",      "label": "Rename",      "bindings": { "single": "F2" } },
+      "20": { "zone": "app",      "label": "Azeron",      "bindings": { "single": "Ctrl+Alt+A" } },
+      "22": { "zone": "git",      "label": "Git Menu",    "bindings": { "single": "radial:git" } },
+      "23": { "zone": "app",      "label": "PowerToys",   "bindings": { "single": "Win+Shift+Q" } },
+      "28": { "zone": "git",      "label": "Push",        "bindings": { "single": "Ctrl+Shift+Alt+U" } },
+      "29": { "zone": "nav",      "label": "Prev Tab",    "bindings": { "single": "Ctrl+PageUp" } },
+      "30": { "zone": "git",      "label": "Pull",        "bindings": { "single": "Ctrl+Shift+Alt+P" } },
+      "31": { "zone": "nav",      "label": "Next Tab",    "bindings": { "single": "Ctrl+PageDown" } },
+      "36": { "zone": "terminal", "label": "Prev Cmd",    "bindings": { "single": "↑" } },
+      "37": { "zone": "thumb",    "label": "Esc",         "bindings": { "single": "Escape" } },
+      "38": { "zone": "edit",     "label": "Close",       "bindings": { "single": "Ctrl+W" } },
+      "41": { "zone": "app",      "label": "ReWASD",      "bindings": { "single": "Ctrl+Alt+R" } }
+    }
+  },
+  "radialMenus": [
+    {
+      "id": "git",
+      "label": "Git",
+      "trigger": "22",
+      "color": "#7c3aed",
+      "actions": [
+        { "direction": "↑", "label": "Push",     "binding": "Ctrl+Shift+Alt+U" },
+        { "direction": "↓", "label": "Pull",     "binding": "Ctrl+Shift+Alt+P" },
+        { "direction": "←", "label": "Stash",    "binding": "Ctrl+Shift+Alt+H" },
+        { "direction": "→", "label": "Stage All","binding": "Ctrl+Shift+Alt+S" },
+        {
+          "direction": "↗",
+          "label": "More Git…",
+          "submenu": {
+            "id": "git-more",
+            "label": "More Git",
+            "trigger": "22",
+            "color": "#a855f7",
+            "actions": [
+              { "direction": "↑", "label": "Branch",  "binding": "Ctrl+Shift+Alt+B" },
+              { "direction": "↓", "label": "Src Ctrl","binding": "Ctrl+Shift+Alt+G" }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

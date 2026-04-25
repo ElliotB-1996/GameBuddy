@@ -1,0 +1,33 @@
+{
+  "id": "cyro-terminal-windows",
+  "label": "Terminal",
+  "platform": "windows",
+  "type": "rewasd",
+  "device": "cyro",
+  "layers": {
+    "default": {
+      "1":  { "zone": "system", "label": "Shot Clip",    "bindings": { "single": "Win+Shift+S" } },
+      "2":  { "zone": "system", "label": "Shot File",    "bindings": { "single": "Win+Shift+S" } },
+      "3":  { "zone": "terminal","label": "Cmd Pal",     "bindings": { "single": "Ctrl+Shift+P" } },
+      "4":  { "zone": "thumb",  "label": "Esc",          "bindings": { "single": "Escape" } },
+      "5":  { "zone": "edit",   "label": "Redo",         "bindings": { "single": "Ctrl+Shift+Z" } },
+      "6":  { "zone": "edit",   "label": "Undo",         "bindings": { "single": "Ctrl+Z" } },
+      "7":  { "zone": "mouse",  "label": "Mid Click",    "bindings": { "single": "Mouse M" } },
+      "8":  { "zone": "terminal","label": "Find",        "bindings": { "single": "Ctrl+Shift+F" } },
+      "9":  { "zone": "edit",   "label": "Paste",        "bindings": { "single": "Ctrl+Shift+V" } },
+      "10": { "zone": "edit",   "label": "Copy",         "bindings": { "single": "Ctrl+Shift+C" } },
+      "11": { "zone": "mouse",  "label": "Right Clk",    "bindings": { "single": "Mouse R" } },
+      "12": { "zone": "mouse",  "label": "Left Clk",     "bindings": { "single": "Mouse L" } },
+      "14": { "zone": "terminal","label": "Clear",       "bindings": { "single": "Ctrl+L" } },
+      "15": { "zone": "terminal","label": "Interrupt",   "bindings": { "single": "Ctrl+C" } },
+      "16": { "zone": "mouse",  "label": "Fwd",          "bindings": { "single": "Mouse Fwd" } },
+      "17": { "zone": "mouse",  "label": "Back",         "bindings": { "single": "Mouse Back" } },
+      "20": { "zone": "thumb",  "label": "Enter",        "bindings": { "single": "Enter" } },
+      "22": { "zone": "thumb",  "label": "Enter",        "bindings": { "single": "Enter" } },
+      "28": { "zone": "system", "label": "Task View",    "bindings": { "single": "Win+Tab" } },
+      "29": { "zone": "system", "label": "Prev Desk",    "bindings": { "single": "Win+Ctrl+Left" } },
+      "30": { "zone": "system", "label": "Win Search",   "bindings": { "single": "Win+S" } },
+      "31": { "zone": "system", "label": "Next Desk",    "bindings": { "single": "Win+Ctrl+Right" } }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "cyborg-windows-default",
+  "label": "Windows Default",
+  "platform": "windows",
+  "type": "azeron",
+  "device": "cyborg",
+  "layers": {
+    "default": {
+      "4":  { "zone": "app", "label": "VS Code",   "bindings": { "single": "Ctrl+Alt+V" } },
+      "8":  { "zone": "app", "label": "Terminal",  "bindings": { "single": "Ctrl+Alt+T" } },
+      "12": { "zone": "app", "label": "Browser",   "bindings": { "single": "Ctrl+Alt+B" } },
+      "13": { "zone": "app",   "label": "Discord",   "bindings": { "single": "Ctrl+Alt+D" } },
+      "37": { "zone": "thumb", "label": "Esc",       "bindings": { "single": "Escape" } },
+      "17": { "zone": "app", "label": "Claude",    "bindings": { "single": "Ctrl+Alt+C" } },
+      "38": { "zone": "app", "label": "Obsidian",  "bindings": { "single": "Ctrl+Alt+O" } }
+    }
+  }
+}

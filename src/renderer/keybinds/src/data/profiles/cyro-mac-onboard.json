@@ -1,0 +1,34 @@
+{
+  "id": "cyro-mac-onboard",
+  "label": "Mac Default",
+  "platform": "mac",
+  "type": "azeron",
+  "device": "cyro",
+  "layers": {
+    "default": {
+      "1":  { "zone": "system", "label": "Shot Clip",    "bindings": { "single": "Win+Shift+S" } },
+      "2":  { "zone": "system", "label": "Shot File",    "bindings": { "single": "Win+Shift+S" } },
+      "3":  { "zone": "edit",   "label": "Cmd Palette",  "bindings": { "single": "Cmd+Shift+P" } },
+      "4":  { "zone": "thumb",  "label": "Profile Sw",   "bindings": { "single": "Profile Switch" } },
+      "5":  { "zone": "edit",   "label": "Redo",         "bindings": { "single": "Cmd+Shift+Z" } },
+      "6":  { "zone": "edit",   "label": "Undo",         "bindings": { "single": "Cmd+Z" } },
+      "7":  { "zone": "mouse",  "label": "Mid Click",    "bindings": { "single": "Mouse M" } },
+      "8":  { "zone": "edit",   "label": "Quick Open",   "bindings": { "single": "Cmd+P" } },
+      "9":  { "zone": "edit",   "label": "Paste",        "bindings": { "single": "Cmd+V", "long": "Profile Switch" } },
+      "10": { "zone": "edit",   "label": "Copy",         "bindings": { "single": "Cmd+C" } },
+      "11": { "zone": "mouse",  "label": "Right Clk",    "bindings": { "single": "Mouse R" } },
+      "12": { "zone": "mouse",  "label": "Left Clk",     "bindings": { "single": "Mouse L" } },
+      "14": { "zone": "edit",   "label": "Save",         "bindings": { "single": "Cmd+S" } },
+      "15": { "zone": "edit",   "label": "Split",        "bindings": { "single": "Cmd+\\" } },
+      "16": { "zone": "mouse",  "label": "Fwd",          "bindings": { "single": "Mouse Fwd" } },
+      "17": { "zone": "mouse",  "label": "Back",         "bindings": { "single": "Mouse Back" } },
+      "20": { "zone": "thumb",  "label": "Enter",        "bindings": { "single": "Enter" } },
+      "22": { "zone": "thumb",  "label": "Enter",        "bindings": { "single": "Enter" } },
+      "24": { "zone": "system", "label": "Scroll",       "bindings": { "single": "Analog Wheel" } },
+      "28": { "zone": "system", "label": "MC Up",        "bindings": { "single": "Mission Control Up" } },
+      "29": { "zone": "system", "label": "MC Left",      "bindings": { "single": "Mission Control Left" } },
+      "30": { "zone": "system", "label": "Spotlight",    "bindings": { "single": "Ctrl+Space" } },
+      "31": { "zone": "system", "label": "MC Right",     "bindings": { "single": "Mission Control Right" } }
+    }
+  }
+}

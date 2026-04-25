@@ -1,0 +1,69 @@
+{
+  "id": "cyborg-terminal-windows",
+  "label": "Terminal",
+  "platform": "windows",
+  "type": "rewasd",
+  "device": "cyborg",
+  "layers": {
+    "default": {
+      "1":  { "zone": "terminal", "label": "New Tab",       "bindings": { "single": "Ctrl+Shift+T" } },
+      "2":  { "zone": "terminal", "label": "Close Tab",     "bindings": { "single": "Ctrl+Shift+W" } },
+      "3":  { "zone": "terminal", "label": "Split Right",   "bindings": { "single": "Alt+Shift+Plus" } },
+      "4":  { "zone": "app",      "label": "VS Code",       "bindings": { "single": "Ctrl+Alt+V" } },
+      "5":  { "zone": "terminal", "label": "Find",          "bindings": { "single": "Ctrl+Shift+F" } },
+      "6":  { "zone": "terminal", "label": "Clear",         "bindings": { "single": "Ctrl+L" } },
+      "7":  { "zone": "terminal", "label": "Copy",          "bindings": { "single": "Ctrl+Shift+C" } },
+      "8":  { "zone": "app",      "label": "Terminal",      "bindings": { "single": "Ctrl+Alt+T" } },
+      "9":  { "zone": "terminal", "label": "Paste",         "bindings": { "single": "Ctrl+Shift+V" } },
+      "10": { "zone": "terminal", "label": "Scroll Up",     "bindings": { "single": "Shift+PageUp" } },
+      "11": { "zone": "terminal", "label": "Scroll Down",   "bindings": { "single": "Shift+PageDown" } },
+      "12": { "zone": "app",      "label": "Browser",       "bindings": { "single": "Ctrl+Alt+B" } },
+      "13": { "zone": "terminal", "label": "Split Down",    "bindings": { "single": "Alt+Shift+Minus" } },
+      "14": { "zone": "terminal", "label": "Pane Left",     "bindings": { "single": "Alt+Left" } },
+      "15": { "zone": "terminal", "label": "Pane Right",    "bindings": { "single": "Alt+Right" } },
+      "16": { "zone": "terminal", "label": "Pane Up",       "bindings": { "single": "Alt+Up" } },
+      "17": { "zone": "app",      "label": "Claude",        "bindings": { "single": "Ctrl+Alt+C" } },
+      "18": { "zone": "terminal", "label": "Close Pane",    "bindings": { "single": "Ctrl+Shift+W" } },
+      "19": { "zone": "terminal", "label": "Zoom Pane",     "bindings": { "single": "Ctrl+Shift+P" } },
+      "20": { "zone": "app",      "label": "Azeron",        "bindings": { "single": "Ctrl+Alt+A" } },
+      "22": { "zone": "git",      "label": "Git Menu",      "bindings": { "single": "radial:git" } },
+      "23": { "zone": "app",      "label": "PowerToys",     "bindings": { "single": "Win+Shift+Q" } },
+      "28": { "zone": "git",      "label": "Push",          "bindings": { "single": "Ctrl+Shift+Alt+U" } },
+      "29": { "zone": "terminal", "label": "Prev Tab",      "bindings": { "single": "Ctrl+Shift+Tab" } },
+      "30": { "zone": "git",      "label": "Pull",          "bindings": { "single": "Ctrl+Shift+Alt+P" } },
+      "31": { "zone": "terminal", "label": "Next Tab",      "bindings": { "single": "Ctrl+Tab" } },
+      "36": { "zone": "terminal", "label": "Prev Cmd",      "bindings": { "single": "↑" } },
+      "37": { "zone": "thumb",    "label": "Esc",           "bindings": { "single": "Escape" } },
+      "38": { "zone": "terminal", "label": "Interrupt",     "bindings": { "single": "Ctrl+C" } },
+      "41": { "zone": "app",      "label": "ReWASD",        "bindings": { "single": "Ctrl+Alt+R" } }
+    }
+  },
+  "radialMenus": [
+    {
+      "id": "git",
+      "label": "Git",
+      "trigger": "22",
+      "color": "#7c3aed",
+      "actions": [
+        { "direction": "↑", "label": "Push",      "binding": "Ctrl+Shift+Alt+U" },
+        { "direction": "↓", "label": "Pull",      "binding": "Ctrl+Shift+Alt+P" },
+        { "direction": "←", "label": "Stash",     "binding": "Ctrl+Shift+Alt+H" },
+        { "direction": "→", "label": "Stage All", "binding": "Ctrl+Shift+Alt+S" },
+        {
+          "direction": "↗",
+          "label": "More Git…",
+          "submenu": {
+            "id": "git-more",
+            "label": "More Git",
+            "trigger": "22",
+            "color": "#a855f7",
+            "actions": [
+              { "direction": "↑", "label": "Branch",   "binding": "Ctrl+Shift+Alt+B" },
+              { "direction": "↓", "label": "Src Ctrl", "binding": "Ctrl+Shift+Alt+G" }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

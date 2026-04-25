@@ -17,13 +17,30 @@ export default defineConfig({
   },
   preload: {
     plugins: [externalizeDepsPlugin()],
+    build: {
+      rollupOptions: {
+        input: {
+          index: resolve("src/preload/index.ts"),
+          keybinds: resolve("src/preload/keybinds.ts"),
+        },
+      },
+    },
   },
   renderer: {
     resolve: {
       alias: {
         "@renderer": resolve("src/renderer/src"),
+        "@keybinds": resolve("src/renderer/keybinds/src"),
       },
     },
     plugins: [react()],
+    build: {
+      rollupOptions: {
+        input: {
+          index: resolve("src/renderer/index.html"),
+          keybinds: resolve("src/renderer/keybinds/index.html"),
+        },
+      },
+    },
   },
 });

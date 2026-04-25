@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { parseRewasd } from './parseRewasd'
-import { ParseError } from './errors'
+import { parseRewasd } from '@keybinds/importers/parseRewasd'
+import { ParseError } from '@keybinds/importers/errors'
 
 const FIXTURE = {
   config: { appName: 'Visual Studio Code' },

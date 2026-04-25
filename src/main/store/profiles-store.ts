@@ -10,14 +10,23 @@ export function loadProfiles(filePath: string): {
     const raw = readFileSync(filePath, "utf-8");
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) {
-      return { data: [], error: "Profiles file is corrupted. Starting with empty state." };
+      return {
+        data: [],
+        error: "Profiles file is corrupted. Starting with empty state.",
+      };
     }
     return { data: parsed as Profile[], error: null };
   } catch (err: unknown) {
-    if (err instanceof Error && (err as NodeJS.ErrnoException).code === "ENOENT") {
+    if (
+      err instanceof Error &&
+      (err as NodeJS.ErrnoException).code === "ENOENT"
+    ) {
       return { data: [], error: null };
     }
-    return { data: [], error: "Profiles file is corrupted. Starting with empty state." };
+    return {
+      data: [],
+      error: "Profiles file is corrupted. Starting with empty state.",
+    };
   }
 }
 

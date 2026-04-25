@@ -1,5 +1,11 @@
 import {
-  app, shell, BrowserWindow, session, Tray, Menu, ipcMain,
+  app,
+  shell,
+  BrowserWindow,
+  session,
+  Tray,
+  Menu,
+  ipcMain,
 } from "electron";
 
 if (process.env.E2E_USER_DATA_DIR) {
@@ -91,7 +97,9 @@ app.whenReady().then(() => {
     (_webContents, permission, callback, details) => {
       if (
         permission === "media" &&
-        (details as Electron.MediaAccessPermissionRequest).mediaTypes?.includes("audio")
+        (details as Electron.MediaAccessPermissionRequest).mediaTypes?.includes(
+          "audio",
+        )
       ) {
         callback(true);
       } else {
@@ -138,7 +146,9 @@ app.whenReady().then(() => {
               else keybindsWindow!.show();
               rebuildTrayMenu();
             },
-            () => { app.quit(); },
+            () => {
+              app.quit();
+            },
           ),
         ),
       );
@@ -157,7 +167,7 @@ app.whenReady().then(() => {
     : join(process.resourcesPath, "models");
 
   const { initialData, loadError } = registerNotesHandlers();
-  const { initialProfiles } = registerKeybindsHandlers(keybindsWindow);
+  const { initialProfiles } = registerKeybindsHandlers();
 
   registerWindowHandlers(notesWindow);
   registerHotkeyHandlers(notesWindow, keybindsWindow);
@@ -171,7 +181,11 @@ app.whenReady().then(() => {
     keybindsWindow!.webContents.send("keybinds:load", initialProfiles);
   });
 
-  registerGlobalHotkeys(notesWindow, keybindsWindow, initialData.settings.hotkeys);
+  registerGlobalHotkeys(
+    notesWindow,
+    keybindsWindow,
+    initialData.settings.hotkeys,
+  );
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {

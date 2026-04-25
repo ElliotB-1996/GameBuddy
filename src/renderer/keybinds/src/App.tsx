@@ -1,82 +1,132 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
-import './index.css'
-import { profiles } from './data/profiles'
-import type { Zone, Profile } from './data/types'
-import Legend from './components/Legend'
-import DeviceSection from './components/DeviceSection'
-import RadialMenus from './components/RadialMenus'
-import { loadImportedProfiles, saveProfile, deleteProfile } from './db'
-import { parseRewasd } from './importers/parseRewasd'
-import { ParseError } from './importers/errors'
+import { useState, useEffect, useRef, useMemo } from "react";
+import "./index.css";
+import { profiles } from "./data/profiles";
+import type { Zone, Profile } from "./data/types";
+import Legend from "./components/Legend";
+import DeviceSection from "./components/DeviceSection";
+import RadialMenus from "./components/RadialMenus";
+import { loadImportedProfiles, saveProfile, deleteProfile } from "./db";
+import { parseRewasd } from "./importers/parseRewasd";
+import { ParseError } from "./importers/errors";
 
 const PROFILE_PAIRS = [
-  { label: 'Mac Default',     platform: 'mac',     cyborgId: 'cyborg-mac-onboard',      cyroId: 'cyro-mac-onboard' },
-  { label: 'Windows Default', platform: 'windows', cyborgId: 'cyborg-windows-default',  cyroId: 'cyro-windows-default' },
-  { label: 'VS Code',         platform: 'windows', cyborgId: 'cyborg-vscode-windows',   cyroId: 'cyro-vscode-windows' },
-  { label: 'Browser',         platform: 'windows', cyborgId: 'cyborg-browser-windows',  cyroId: 'cyro-browser-windows' },
-  { label: 'Terminal',        platform: 'windows', cyborgId: 'cyborg-terminal-windows', cyroId: 'cyro-terminal-windows' },
-  { label: 'Discord',         platform: 'windows', cyborgId: 'cyborg-discord-windows',  cyroId: 'cyro-discord-windows' },
-  { label: 'Obsidian',        platform: 'windows', cyborgId: 'cyborg-obsidian-windows', cyroId: 'cyro-obsidian-windows' },
-  { label: 'Spotify',         platform: 'windows', cyborgId: 'cyborg-spotify-windows',  cyroId: 'cyro-spotify-windows' },
-]
+  {
+    label: "Mac Default",
+    platform: "mac",
+    cyborgId: "cyborg-mac-onboard",
+    cyroId: "cyro-mac-onboard",
+  },
+  {
+    label: "Windows Default",
+    platform: "windows",
+    cyborgId: "cyborg-windows-default",
+    cyroId: "cyro-windows-default",
+  },
+  {
+    label: "VS Code",
+    platform: "windows",
+    cyborgId: "cyborg-vscode-windows",
+    cyroId: "cyro-vscode-windows",
+  },
+  {
+    label: "Browser",
+    platform: "windows",
+    cyborgId: "cyborg-browser-windows",
+    cyroId: "cyro-browser-windows",
+  },
+  {
+    label: "Terminal",
+    platform: "windows",
+    cyborgId: "cyborg-terminal-windows",
+    cyroId: "cyro-terminal-windows",
+  },
+  {
+    label: "Discord",
+    platform: "windows",
+    cyborgId: "cyborg-discord-windows",
+    cyroId: "cyro-discord-windows",
+  },
+  {
+    label: "Obsidian",
+    platform: "windows",
+    cyborgId: "cyborg-obsidian-windows",
+    cyroId: "cyro-obsidian-windows",
+  },
+  {
+    label: "Spotify",
+    platform: "windows",
+    cyborgId: "cyborg-spotify-windows",
+    cyroId: "cyro-spotify-windows",
+  },
+];
 
-export default function App() {
-  const [activeTab, setActiveTab]               = useState(0)
-  const [activeZone, setActiveZone]             = useState<Zone | null>(null)
-  const [importedProfiles, setImportedProfiles] = useState<Profile[]>([])
-  const [importError, setImportError]           = useState<string | null>(null)
-  const fileInputRef                            = useRef<HTMLInputElement>(null)
+export default function App(): JSX.Element {
+  const [activeTab, setActiveTab] = useState(0);
+  const [activeZone, setActiveZone] = useState<Zone | null>(null);
+  const [importedProfiles, setImportedProfiles] = useState<Profile[]>([]);
+  const [importError, setImportError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    loadImportedProfiles().then(setImportedProfiles)
-  }, [])
+    loadImportedProfiles().then(setImportedProfiles);
+  }, []);
 
   const importedGroups = useMemo(() => {
-    const seen = new Map<string, Profile[]>()
+    const seen = new Map<string, Profile[]>();
     for (const p of importedProfiles) {
-      const key = p.pairId ?? p.id
-      if (!seen.has(key)) seen.set(key, [])
-      seen.get(key)!.push(p)
+      const key = p.pairId ?? p.id;
+      if (!seen.has(key)) seen.set(key, []);
+      seen.get(key)!.push(p);
     }
-    return Array.from(seen.values())
-  }, [importedProfiles])
+    return Array.from(seen.values());
+  }, [importedProfiles]);
 
-  function toggleZone(zone: Zone) {
-    setActiveZone(prev => prev === zone ? null : zone)
+  function toggleZone(zone: Zone): void {
+    setActiveZone((prev) => (prev === zone ? null : zone));
   }
 
-  async function handleDeleteGroup(key: string) {
-    const toDelete = importedProfiles.filter(p => (p.pairId ?? p.id) === key)
-    for (const p of toDelete) await deleteProfile(p.id)
-    setImportedProfiles(prev => prev.filter(p => (p.pairId ?? p.id) !== key))
-    setActiveTab(0)
+  async function handleDeleteGroup(key: string): Promise<void> {
+    const toDelete = importedProfiles.filter((p) => (p.pairId ?? p.id) === key);
+    for (const p of toDelete) await deleteProfile(p.id);
+    setImportedProfiles((prev) =>
+      prev.filter((p) => (p.pairId ?? p.id) !== key),
+    );
+    setActiveTab(0);
   }
 
-  async function handleImport(file: File) {
+  async function handleImport(file: File): Promise<void> {
     try {
-      const text = await file.text()
-      const json = JSON.parse(text) as unknown
-      const parsed = parseRewasd(json)
+      const text = await file.text();
+      const json = JSON.parse(text) as unknown;
+      const parsed = parseRewasd(json);
       for (const profile of parsed) {
-        await saveProfile(profile)
+        await saveProfile(profile);
       }
-      const next = [...importedProfiles, ...parsed]
-      setImportedProfiles(next)
-      const nextGroupCount = new Set(next.map(p => p.pairId ?? p.id)).size
-      setActiveTab(PROFILE_PAIRS.length + nextGroupCount - 1)
-      setImportError(null)
+      const next = [...importedProfiles, ...parsed];
+      setImportedProfiles(next);
+      const nextGroupCount = new Set(next.map((p) => p.pairId ?? p.id)).size;
+      setActiveTab(PROFILE_PAIRS.length + nextGroupCount - 1);
+      setImportError(null);
     } catch (e) {
-      setImportError(e instanceof ParseError ? e.message : 'Could not read file — is it a valid reWASD export?')
+      setImportError(
+        e instanceof ParseError
+          ? e.message
+          : "Could not read file — is it a valid reWASD export?",
+      );
     }
   }
 
-  const isImportedTab   = activeTab >= PROFILE_PAIRS.length
-  const importedGroup   = isImportedTab ? importedGroups[activeTab - PROFILE_PAIRS.length] : undefined
-  const importedCyborg  = importedGroup?.find(p => p.device === 'cyborg')
-  const importedCyro    = importedGroup?.find(p => p.device === 'cyro')
-  const pair            = !isImportedTab ? PROFILE_PAIRS[activeTab] : null
-  const cyborg          = pair ? profiles.find(p => p.id === pair.cyborgId) : undefined
-  const cyro            = pair ? profiles.find(p => p.id === pair.cyroId)   : undefined
+  const isImportedTab = activeTab >= PROFILE_PAIRS.length;
+  const importedGroup = isImportedTab
+    ? importedGroups[activeTab - PROFILE_PAIRS.length]
+    : undefined;
+  const importedCyborg = importedGroup?.find((p) => p.device === "cyborg");
+  const importedCyro = importedGroup?.find((p) => p.device === "cyro");
+  const pair = !isImportedTab ? PROFILE_PAIRS[activeTab] : null;
+  const cyborg = pair
+    ? profiles.find((p) => p.id === pair.cyborgId)
+    : undefined;
+  const cyro = pair ? profiles.find((p) => p.id === pair.cyroId) : undefined;
 
   return (
     <>
@@ -86,7 +136,7 @@ export default function App() {
           {PROFILE_PAIRS.map((p, i) => (
             <button
               key={i}
-              className={`tab ${activeTab === i ? 'active' : 'inactive'}`}
+              className={`tab ${activeTab === i ? "active" : "inactive"}`}
               onClick={() => setActiveTab(i)}
             >
               {p.label}
@@ -94,12 +144,12 @@ export default function App() {
             </button>
           ))}
           {importedGroups.map((group, i) => {
-            const tabIndex = PROFILE_PAIRS.length + i
-            const key      = group[0].pairId ?? group[0].id
+            const tabIndex = PROFILE_PAIRS.length + i;
+            const key = group[0].pairId ?? group[0].id;
             return (
               <button
                 key={key}
-                className={`tab ${activeTab === tabIndex ? 'active' : 'inactive'} tab-imported`}
+                className={`tab ${activeTab === tabIndex ? "active" : "inactive"} tab-imported`}
                 onClick={() => setActiveTab(tabIndex)}
               >
                 {group[0].label}
@@ -108,23 +158,31 @@ export default function App() {
                   className="tab-delete"
                   role="button"
                   aria-label="Remove profile"
-                  onClick={e => { e.stopPropagation(); handleDeleteGroup(key) }}
-                >✕</span>
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteGroup(key);
+                  }}
+                >
+                  ✕
+                </span>
               </button>
-            )
+            );
           })}
           <input
             ref={fileInputRef}
             type="file"
             accept=".rewasd"
-            style={{ display: 'none' }}
-            onChange={e => {
-              const f = e.target.files?.[0]
-              if (f) handleImport(f)
-              e.target.value = ''
+            style={{ display: "none" }}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handleImport(f);
+              e.target.value = "";
             }}
           />
-          <button className="tab tab-import" onClick={() => fileInputRef.current?.click()}>
+          <button
+            className="tab tab-import"
+            onClick={() => fileInputRef.current?.click()}
+          >
             + Import
           </button>
         </div>
@@ -143,13 +201,22 @@ export default function App() {
           {importedGroup ? (
             <>
               {importedCyborg && (
-                <DeviceSection profile={importedCyborg} activeZone={activeZone} />
+                <DeviceSection
+                  profile={importedCyborg}
+                  activeZone={activeZone}
+                />
               )}
               <div className="right-col">
                 {importedCyro && (
-                  <DeviceSection profile={importedCyro} activeZone={activeZone} className="column" />
+                  <DeviceSection
+                    profile={importedCyro}
+                    activeZone={activeZone}
+                    className="column"
+                  />
                 )}
-                <RadialMenus menus={(importedCyborg ?? importedCyro)?.radialMenus ?? []} />
+                <RadialMenus
+                  menus={(importedCyborg ?? importedCyro)?.radialMenus ?? []}
+                />
               </div>
             </>
           ) : (
@@ -159,7 +226,11 @@ export default function App() {
               )}
               <div className="right-col">
                 {cyro && (
-                  <DeviceSection profile={cyro} activeZone={activeZone} className="column" />
+                  <DeviceSection
+                    profile={cyro}
+                    activeZone={activeZone}
+                    className="column"
+                  />
                 )}
                 <RadialMenus menus={cyborg?.radialMenus ?? []} />
               </div>
@@ -168,5 +239,5 @@ export default function App() {
         </div>
       </div>
     </>
-  )
+  );
 }

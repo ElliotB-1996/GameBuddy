@@ -6,7 +6,14 @@ export function buildAccelerator(hotkey: string): string {
 }
 
 const VALID_MODIFIERS = new Set([
-  "ctrl", "control", "alt", "shift", "meta", "super", "command", "cmdorctrl",
+  "ctrl",
+  "control",
+  "alt",
+  "shift",
+  "meta",
+  "super",
+  "command",
+  "cmdorctrl",
 ]);
 
 const VALID_KEY_PATTERN =
@@ -41,12 +48,9 @@ export function registerGlobalHotkeys(
   unregisterGlobalHotkeys();
 
   const register = (key: string, fn: () => void): boolean => {
-    if (!key) { console.log(`[hotkeys] skipped empty key`); return false; }
-    const err = validateAccelerator(key);
-    if (err !== null) { console.log(`[hotkeys] invalid accelerator "${key}": ${err}`); return false; }
-    const ok = globalShortcut.register(buildAccelerator(key), fn);
-    console.log(`[hotkeys] register "${key}" →`, ok ? "ok" : "FAILED (already taken by another app?)");
-    return ok;
+    if (!key) return false;
+    if (validateAccelerator(key) !== null) return false;
+    return globalShortcut.register(buildAccelerator(key), fn);
   };
 
   register(hotkeys.toggleVisibility, () => {
@@ -63,7 +67,6 @@ export function registerGlobalHotkeys(
   });
 
   register(hotkeys.toggleKeybinds, () => {
-    console.log(`[hotkeys] toggleKeybinds fired, isVisible=${keybindsWin.isVisible()}`);
     if (keybindsWin.isVisible()) keybindsWin.hide();
     else keybindsWin.show();
   });

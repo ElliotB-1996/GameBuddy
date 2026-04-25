@@ -12,7 +12,7 @@ Run `npm audit` before merging any branch that adds or updates dependencies. If 
 
 ## Project Overview
 
-**Game Overlay Notes** — An Electron + React + TypeScript desktop app providing an always-on-top transparent overlay for taking notes while gaming. Key features: voice-to-text (Whisper via `@huggingface/transformers`), view/edit modes with distinct mouse event behavior, global hotkeys, system tray integration, and persistent local JSON storage.
+**Game Overlay Notes** — An Electron + React + TypeScript desktop app providing two always-on-top transparent overlay windows: a notes overlay for taking notes while gaming, and a keybinds dashboard displaying Azeron keypad profiles. Key features: voice-to-text (Whisper via `@huggingface/transformers`), view/edit modes, global hotkeys, system tray integration, and persistent local JSON storage.
 
 ## Commands
 
@@ -36,13 +36,23 @@ npm run download-model   # Download Whisper model to resources/models/
 
 ## Architecture
 
-The app follows the standard Electron 3-process model with strict IPC boundaries:
+The app follows the standard Electron 3-process model with strict IPC boundaries.
 
-**Main process** (`src/main/`): Window creation, system tray, global hotkeys, file I/O, voice transcription in a Worker thread. IPC handlers live in `src/main/ipc/` (notes, window, hotkeys, voice).
+### Windows
 
-**Preload** (`src/preload/index.ts`): Context bridge exposing `window.api` to the renderer. All renderer↔main communication goes through typed methods and event listeners defined here.
+Two always-on-top, frameless, transparent, skipTaskbar windows:
+- **Notes window** (420×680) — starts visible, notes overlay
+- **Keybinds window** (1100×700) — starts hidden, Azeron keypad reference dashboard
 
-**Renderer** (`src/renderer/src/`): React app. `App.tsx` owns top-level state. `useNotes` hook manages all note/section/settings state. `useAudio` hook manages MediaRecorder → PCM pipeline for voice.
+Each window has its own preload:
+- `src/preload/index.ts` → exposes `window.api` to the notes renderer
+- `src/preload/keybinds.ts` → exposes `window.keybindsApi` to the keybinds renderer
+
+**Main process** (`src/main/`): Window creation, system tray, global hotkeys, file I/O, voice transcription in a Worker thread. IPC handlers live in `src/main/ipc/` (notes, window, hotkeys, keybinds, voice).
+
+**Renderer — notes** (`src/renderer/src/`): React app. `App.tsx` owns top-level state. `useNotes` hook manages all note/section/settings state. `useAudio` hook manages MediaRecorder → PCM pipeline for voice.
+
+**Renderer — keybinds** (`src/renderer/keybinds/src/`): Peripherals-map React app. Displays Azeron Cyborg and Cyro keybind profiles from built-in JSON data and imported `.rewasd` files. See `src/renderer/keybinds/CLAUDE.md` for details.
 
 ### Data flow
 
@@ -51,15 +61,40 @@ The app follows the standard Electron 3-process model with strict IPC boundaries
 - **Voice**: `useAudio` records WebM → decodes to PCM Float32Array at 16kHz → `window.api.transcribeAudio()` → Worker thread runs Whisper → `voice:result` event → note added
 - **Mode toggle**: UI/hotkey → `window.api.setMode()` → main updates `setIgnoreMouseEvents` + opacity → tray updates
 
+### IPC patterns
+
+Both windows follow the same pattern:
+1. Main loads data from file at startup
+2. After `did-finish-load`, main sends data via `channel:load`
+3. Renderer receives via `ipcRenderer.once` (preload wraps this)
+4. Save/delete go via `ipcMain.handle`
+
+| Channel | Direction | Description |
+|---------|-----------|-------------|
+| `notes:load` | Main → Notes renderer | Sends initial `AppData` |
+| `notes:save` | Notes renderer → Main | Persists full `AppData` |
+| `keybinds:load` | Main → Keybinds renderer | Sends initial `Profile[]` |
+| `keybinds:save` | Keybinds renderer → Main | Upserts one `Profile` |
+| `keybinds:delete` | Keybinds renderer → Main | Removes one profile by id |
+
+### File stores
+
+- `src/main/store/notes-store.ts` — reads/writes `userData/notes.json` (full `AppData`)
+- `src/main/store/profiles-store.ts` — reads/writes `userData/profiles.json` (`Profile[]`)
+
+Both use synchronous `fs.readFileSync` / `fs.writeFileSync`.
+
 ### Key files
 
 | File | Purpose |
 |------|---------|
 | `src/renderer/src/types.ts` | Single source of truth for all TypeScript interfaces (`AppData`, `Section`, `Note`, `Hotkeys`, `Appearance`) |
 | `src/main/store/notes-store.ts` | Loads/saves `notes.json`, merges with defaults for forward-compat |
+| `src/main/store/profiles-store.ts` | Loads/saves `profiles.json` (imported reWASD profiles) |
 | `src/main/voice/whisper-worker.ts` | Worker thread running Whisper; stubs `sharp` to avoid Windows DLL issues |
-| `src/main/ipc/hotkeys-handler.ts` | Validates accelerator strings, registers `globalShortcut` |
+| `src/main/ipc/hotkeys-handler.ts` | Validates accelerator strings, registers `globalShortcut` for both windows |
 | `src/main/ipc/window-handler.ts` | View mode = `setIgnoreMouseEvents(true)` (clicks pass through to game); Edit mode = normal |
+| `src/main/ipc/keybinds-handler.ts` | IPC handlers for keybinds profile load/save/delete |
 
 ## Testing
 

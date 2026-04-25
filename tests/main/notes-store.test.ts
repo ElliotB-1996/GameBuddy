@@ -99,6 +99,9 @@ describe("loadNotes settings migration", () => {
     expect(result.data.settings.hotkeys.startVoiceNote).toBe(
       DEFAULT_APP_DATA.settings.hotkeys.startVoiceNote,
     );
+    expect(result.data.settings.hotkeys.toggleKeybinds).toBe(
+      DEFAULT_APP_DATA.settings.hotkeys.toggleKeybinds,
+    );
   });
 });
 
@@ -106,7 +109,7 @@ describe("saveNotes and loadNotes round-trip", () => {
   it("round-trips collapsed field on notes", () => {
     const filePath = join(tempDir, "collapsed-test.json");
     const data: AppData = {
-      settings: { hotkeys: { toggleVisibility: "Alt+H", toggleEditMode: "Alt+E", startVoiceNote: "Alt+V" } },
+      settings: { hotkeys: { toggleVisibility: "Alt+H", toggleEditMode: "Alt+E", startVoiceNote: "Alt+V", toggleKeybinds: "Alt+K" } },
       appearance: {
         bgColor: "#0f172a", headerColor: "#1e293b", accentColor: "#6366f1",
         textColor: "#e2e8f0", noteColor: "#1e293b", fontSize: 13,

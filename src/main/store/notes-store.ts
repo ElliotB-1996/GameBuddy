@@ -19,6 +19,7 @@ export const DEFAULT_APP_DATA: AppData = {
       toggleVisibility: "Alt+Shift+N",
       toggleEditMode: "Alt+Shift+E",
       startVoiceNote: "Alt+Shift+V",
+      toggleKeybinds: "Alt+Shift+K",
     },
     audioDeviceId: "",
   },

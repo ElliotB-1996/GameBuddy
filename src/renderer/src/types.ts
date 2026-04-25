@@ -34,6 +34,7 @@ export interface Hotkeys {
   toggleVisibility: string;
   toggleEditMode: string;
   startVoiceNote: string;
+  toggleKeybinds: string;
 }
 
 export interface Settings {

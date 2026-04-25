@@ -8,6 +8,7 @@ const hotkeys: Hotkeys = {
   toggleVisibility: "Alt+Shift+N",
   toggleEditMode: "Alt+Shift+E",
   startVoiceNote: "Alt+Shift+V",
+  toggleKeybinds: "Alt+Shift+K",
 };
 
 const appearance: Appearance = {
@@ -56,11 +57,12 @@ function renderPanel(
 }
 
 describe("SettingsPanel — Hotkeys tab (default)", () => {
-  it("renders all three hotkey fields", () => {
+  it("renders all four hotkey fields", () => {
     renderPanel();
     expect(screen.getByText("Show / Hide Overlay")).toBeInTheDocument();
     expect(screen.getByText("Toggle Edit Mode")).toBeInTheDocument();
     expect(screen.getByText("Start Voice Note")).toBeInTheDocument();
+    expect(screen.getByText("Show / Hide Keybinds")).toBeInTheDocument();
   });
 
   it("calls onSave with current hotkeys and audioDeviceId when Save clicked", async () => {

@@ -22,6 +22,7 @@ const LABELS: Record<HotkeyKey, string> = {
   toggleVisibility: "Show / Hide Overlay",
   toggleEditMode: "Toggle Edit Mode",
   startVoiceNote: "Start Voice Note",
+  toggleKeybinds: "Show / Hide Keybinds",
 };
 
 const TAB_LABELS: Record<Tab, string> = {

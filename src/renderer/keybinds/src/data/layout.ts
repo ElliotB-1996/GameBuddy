@@ -12,19 +12,13 @@ export type ThumbCell = { id: string; dir: string } | null;
 
 export const CYBORG_THUMB: ThumbCell[][] = [
   [
-    { id: "22", dir: "◉" },
-    { id: "28", dir: "↑" },
     { id: "29", dir: "←" },
+    { id: "28", dir: "↑" },
+    { id: "22", dir: "◉" },
     { id: "30", dir: "↓" },
     { id: "31", dir: "→" },
   ],
-  [
-    { id: "41", dir: "↗" },
-    { id: "23", dir: "◉" },
-    { id: "20", dir: "↘" },
-    null,
-    null,
-  ],
+  [null, { id: "41", dir: "↗" }, { id: "23", dir: "◉" }, { id: "20", dir: "↘" }, null],
 ];
 
 export const CYRO_GRID: GridRow[] = [

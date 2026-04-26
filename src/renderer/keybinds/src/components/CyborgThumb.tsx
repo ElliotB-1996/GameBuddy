@@ -44,19 +44,22 @@ export default function CyborgThumb({ layer, activeZone }: Props): JSX.Element {
         className="thumb-btns"
         style={{ gridTemplateColumns: "repeat(5, auto)" }}
       >
-        {CYBORG_THUMB.flat().map((cell: ThumbCell, i) =>
-          cell ? (
-            <TBtn
-              key={cell.id}
-              id={cell.id}
-              dir={cell.dir}
-              layer={layer}
-              activeZone={activeZone}
-            />
-          ) : (
-            <div key={`sp-${i}`} />
+        {CYBORG_THUMB.flatMap((row, ri) => [
+          ...(ri > 0 ? [<div key={`sep-${ri}`} className="thumb-sep" />] : []),
+          ...row.map((cell: ThumbCell, ci) =>
+            cell ? (
+              <TBtn
+                key={cell.id}
+                id={cell.id}
+                dir={cell.dir}
+                layer={layer}
+                activeZone={activeZone}
+              />
+            ) : (
+              <div key={`sp-${ri}-${ci}`} />
+            ),
           ),
-        )}
+        ])}
       </div>
     </div>
   );

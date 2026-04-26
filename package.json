@@ -46,6 +46,7 @@
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@huggingface/transformers": "^4.1.0",
+    "active-win": "^8.2.1",
     "uuid": "^13.0.0"
   },
   "devDependencies": {

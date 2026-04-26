@@ -12,6 +12,14 @@ const keybindsApi = {
     ipcRenderer.invoke("keybinds:save", profile),
   deleteProfile: (id: string): Promise<void> =>
     ipcRenderer.invoke("keybinds:delete", id),
+  onActiveApp: (cb: (processName: string) => void) => {
+    ipcRenderer.on("keybinds:active-app", (_event, processName: string) =>
+      cb(processName),
+    );
+  },
+  removeActiveAppListener: () => {
+    ipcRenderer.removeAllListeners("keybinds:active-app");
+  },
 };
 
 contextBridge.exposeInMainWorld("keybindsApi", keybindsApi);

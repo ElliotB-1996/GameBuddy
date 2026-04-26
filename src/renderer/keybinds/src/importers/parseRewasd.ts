@@ -50,6 +50,7 @@ interface RewasdCircle {
 interface RewasdShift {
   id: number;
   type: string;
+  description?: string;
 }
 
 interface RewasdMapping {
@@ -199,13 +200,25 @@ function dikToKey(dik: string): string {
 
 const MODIFIER_KEYS = new Set(["Ctrl", "Shift", "Alt", "Win"]);
 
+const MOUSE_NAMES: Record<number, string> = {
+  1: "LClick",
+  2: "RClick",
+  3: "MClick",
+  4: "Mouse4",
+  5: "Mouse5",
+};
+
 function macrosToBinding(macros: RewasdMacroItem[]): string | undefined {
   const seen = new Set<string>();
   const keys: string[] = [];
   for (const m of macros) {
-    if (!m.keyboard) continue;
-    const key = dikToKey(m.keyboard.description);
-    if (!seen.has(key)) {
+    let key: string | undefined;
+    if (m.keyboard) {
+      key = dikToKey(m.keyboard.description);
+    } else if (m.mouse) {
+      key = MOUSE_NAMES[m.mouse.buttonId] ?? `Mouse${m.mouse.buttonId}`;
+    }
+    if (key && !seen.has(key)) {
       seen.add(key);
       keys.push(key);
     }
@@ -259,11 +272,16 @@ const CYRO_BTN: Record<number, string> = {
   17: "4",
   16: "5",
   15: "6",
+  14: "7",
   13: "8",
   8: "9",
   7: "10",
+  6: "11",
+  5: "12",
   4: "14",
   3: "15",
+  2: "16",
+  1: "17",
   10: "20",
   9: "22",
   33: "28",
@@ -436,8 +454,13 @@ function parseRadialMenus(
 
 // ── Main parser ───────────────────────────────────────────────────────────────
 
-type LayerPair = { default: Layer; shift: Layer };
 type ActivatorType = "single" | "long" | "double";
+
+function shiftLayerDisplayName(key: string): string {
+  if (key === "shift") return "Shift";
+  const m = /^shift-(\d+)$/.exec(key);
+  return m ? `Shift ${m[1]}` : key;
+}
 
 export function parseRewasd(json: unknown): Profile[] {
   if (!isRewasdFile(json))
@@ -449,6 +472,19 @@ export function parseRewasd(json: unknown): Profile[] {
   const radialShiftIds = new Set(
     shifts.filter((s) => s.type === "radialMenu").map((s) => s.id),
   );
+
+  // Map each non-radial shiftId to a stable layer key and collect display labels.
+  // First shift → "shift" (backward compat), subsequent → "shift-2", "shift-3", …
+  const shiftIdToLayerKey = new Map<number, string>();
+  const layerLabelsMap = new Map<string, string>();
+  let shiftCount = 0;
+  for (const shift of shifts) {
+    if (radialShiftIds.has(shift.id)) continue;
+    shiftCount++;
+    const key = shiftCount === 1 ? "shift" : `shift-${shiftCount}`;
+    shiftIdToLayerKey.set(shift.id, key);
+    if (shift.description) layerLabelsMap.set(key, shift.description);
+  }
 
   // Physical mask index: maskId → {deviceId, buttonId}
   const physicalMasks = new Map<number, RewasdMaskSet>();
@@ -466,16 +502,18 @@ export function parseRewasd(json: unknown): Profile[] {
   if (gamepads[0]) deviceIdToDevice.set(gamepads[0].id, "cyborg");
   if (gamepads[1]) deviceIdToDevice.set(gamepads[1].id, "cyro");
 
-  const byDevice = new Map<Device, LayerPair>();
+  const byDevice = new Map<Device, Record<string, Layer>>();
 
-  function getLayer(device: Device, layerKey: "default" | "shift"): Layer {
-    if (!byDevice.has(device)) byDevice.set(device, { default: {}, shift: {} });
-    return byDevice.get(device)![layerKey];
+  function getLayer(device: Device, layerKey: string): Layer {
+    if (!byDevice.has(device)) byDevice.set(device, { default: {} });
+    const deviceLayers = byDevice.get(device)!;
+    if (!deviceLayers[layerKey]) deviceLayers[layerKey] = {};
+    return deviceLayers[layerKey]!;
   }
 
   function setButton(
     device: Device,
-    layerKey: "default" | "shift",
+    layerKey: string,
     btnId: string,
     label: string,
     binding: string | undefined,
@@ -494,8 +532,10 @@ export function parseRewasd(json: unknown): Profile[] {
     // Skip radial-menu-layer mappings (handled by parseRadialMenus)
     if (shiftId !== undefined && radialShiftIds.has(shiftId)) continue;
 
-    const layerKey: "default" | "shift" =
-      shiftId !== undefined ? "shift" : "default";
+    const layerKey: string =
+      shiftId !== undefined
+        ? (shiftIdToLayerKey.get(shiftId) ?? "shift")
+        : "default";
     const activatorRaw = mapping.condition?.mask?.activator?.type ?? "single";
     const activator: ActivatorType =
       activatorRaw === "long"
@@ -537,13 +577,28 @@ export function parseRewasd(json: unknown): Profile[] {
     if (!device) continue;
 
     const btnId = toAzeronId(device, maskEntry.buttonId);
-    const binding = mapping.jumpToLayer
-      ? undefined
-      : macrosToBinding(mapping.macros ?? []);
-    const label =
-      mapping.description?.trim() ||
-      (mapping.jumpToLayer ? "Radial Menu" : (binding ?? `Button ${btnId}`));
 
+    if (mapping.jumpToLayer) {
+      const targetId = mapping.jumpToLayer.layer;
+      // Radial menu jumps are rendered by parseRadialMenus — skip here
+      if (radialShiftIds.has(targetId)) continue;
+      // layer 0 = return to default; otherwise look up the named shift layer
+      let targetName: string;
+      if (targetId === 0) {
+        targetName = "Default";
+      } else {
+        const targetKey = shiftIdToLayerKey.get(targetId);
+        if (!targetKey) continue;
+        targetName =
+          layerLabelsMap.get(targetKey) ?? shiftLayerDisplayName(targetKey);
+      }
+      const label = mapping.description?.trim() ?? "Layer Switch";
+      setButton(device, layerKey, btnId, label, `→ ${targetName}`, activator);
+      continue;
+    }
+
+    const binding = macrosToBinding(mapping.macros ?? []);
+    const label = mapping.description?.trim() || (binding ?? `Button ${btnId}`);
     setButton(device, layerKey, btnId, label, binding, activator);
   }
 
@@ -554,22 +609,19 @@ export function parseRewasd(json: unknown): Profile[] {
   const ts = Date.now();
   const pairId = `imported-rewasd-${slug}-${ts}`;
   const radialMenus = parseRadialMenus(json, physicalMasks, deviceIdToDevice);
+  const layerLabels =
+    layerLabelsMap.size > 0 ? Object.fromEntries(layerLabelsMap) : undefined;
 
-  return Array.from(byDevice.entries()).map(([device, pair]) => {
-    const hasShift = Object.keys(pair.shift).length > 0;
-    return {
-      id: `${pairId}-${device}`,
-      label: appName,
-      platform: "windows" as const,
-      type: "rewasd" as const,
-      device,
-      pairId,
-      layers: {
-        default: pair.default,
-        ...(hasShift ? { shift: pair.shift } : {}),
-      },
-      radialMenus,
-      imported: true as const,
-    };
-  });
+  return Array.from(byDevice.entries()).map(([device, layers]) => ({
+    id: `${pairId}-${device}`,
+    label: appName,
+    platform: "windows" as const,
+    type: "rewasd" as const,
+    device,
+    pairId,
+    layers: layers as Profile["layers"],
+    ...(layerLabels ? { layerLabels } : {}),
+    radialMenus,
+    imported: true as const,
+  }));
 }

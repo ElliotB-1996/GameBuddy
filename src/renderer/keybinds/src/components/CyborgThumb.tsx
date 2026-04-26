@@ -1,5 +1,6 @@
 import type { Layer, Zone } from "../data/types";
-import { CYBORG_JOYSTICK, CYBORG_THUMB } from "../data/layout";
+import { CYBORG_THUMB } from "../data/layout";
+import type { ThumbCell } from "../data/layout";
 
 interface Props {
   layer: Layer;
@@ -37,27 +38,25 @@ function TBtn({ id, dir, layer, activeZone }: TBtnProps): JSX.Element {
 }
 
 export default function CyborgThumb({ layer, activeZone }: Props): JSX.Element {
-  const j = CYBORG_JOYSTICK;
-
   return (
     <div className="thumb-area">
-      <div className="joystick">
-        <div className="joystick-nub" />
-        <span className="jl j-up">Push #{j.up}</span>
-        <span className="jl j-down">Pull #{j.down}</span>
-        <span className="jl j-left">Prev #{j.left}</span>
-        <span className="jl j-right">Next #{j.right}</span>
-      </div>
-      <div className="thumb-btns" style={{ gridTemplateColumns: "1fr 1fr" }}>
-        {CYBORG_THUMB.flat().map(({ id, dir }) => (
-          <TBtn
-            key={id}
-            id={id}
-            dir={dir}
-            layer={layer}
-            activeZone={activeZone}
-          />
-        ))}
+      <div
+        className="thumb-btns"
+        style={{ gridTemplateColumns: "repeat(5, auto)" }}
+      >
+        {CYBORG_THUMB.flat().map((cell: ThumbCell, i) =>
+          cell ? (
+            <TBtn
+              key={cell.id}
+              id={cell.id}
+              dir={cell.dir}
+              layer={layer}
+              activeZone={activeZone}
+            />
+          ) : (
+            <div key={`sp-${i}`} />
+          ),
+        )}
       </div>
     </div>
   );

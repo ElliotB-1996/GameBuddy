@@ -11,7 +11,7 @@ export default function CyroThumb({ layer, activeZone }: Props): JSX.Element {
     <div className="cyro-thumb thumb-area">
       <div
         className="thumb-btns"
-        style={{ gridTemplateColumns: `repeat(${CYRO_THUMB.length}, 1fr)` }}
+        style={{ gridTemplateColumns: `repeat(${CYRO_THUMB.length}, auto)` }}
       >
         {CYRO_THUMB.map(({ id, dir }) => {
           const btn = layer[id];

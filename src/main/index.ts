@@ -23,6 +23,10 @@ import {
 } from "./ipc/hotkeys-handler";
 import { registerKeybindsHandlers } from "./ipc/keybinds-handler";
 import { registerVoiceHandlers } from "./voice/voice-handler";
+import {
+  startActiveAppWatcher,
+  stopActiveAppWatcher,
+} from "./active-app-watcher";
 import { buildTrayMenuItems, type TrayMode } from "./tray-menu";
 
 let notesWindow: BrowserWindow | null = null;
@@ -36,6 +40,7 @@ function createNotesWindow(): BrowserWindow {
     transparent: true,
     skipTaskbar: true,
     resizable: true,
+    show: false,
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
       sandbox: false,
@@ -114,6 +119,7 @@ app.whenReady().then(() => {
 
   notesWindow = createNotesWindow();
   keybindsWindow = createKeybindsWindow();
+  startActiveAppWatcher(keybindsWindow);
 
   // Tray setup
   if (!process.env.E2E_NO_TRAY) {
@@ -197,5 +203,6 @@ app.whenReady().then(() => {
 
 app.on("window-all-closed", () => {
   unregisterGlobalHotkeys();
+  stopActiveAppWatcher();
   if (process.platform !== "darwin") app.quit();
 });

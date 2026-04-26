@@ -15,48 +15,62 @@ const PROFILE_PAIRS = [
     platform: "mac",
     cyborgId: "cyborg-mac-onboard",
     cyroId: "cyro-mac-onboard",
+    appNames: [] as string[],
   },
   {
     label: "Windows Default",
     platform: "windows",
     cyborgId: "cyborg-windows-default",
     cyroId: "cyro-windows-default",
+    appNames: [] as string[],
   },
   {
     label: "VS Code",
     platform: "windows",
     cyborgId: "cyborg-vscode-windows",
     cyroId: "cyro-vscode-windows",
+    appNames: ["Code.exe"],
   },
   {
     label: "Browser",
     platform: "windows",
     cyborgId: "cyborg-browser-windows",
     cyroId: "cyro-browser-windows",
+    appNames: [
+      "chrome.exe",
+      "msedge.exe",
+      "firefox.exe",
+      "brave.exe",
+      "opera.exe",
+    ],
   },
   {
     label: "Terminal",
     platform: "windows",
     cyborgId: "cyborg-terminal-windows",
     cyroId: "cyro-terminal-windows",
+    appNames: ["WindowsTerminal.exe", "cmd.exe", "powershell.exe", "pwsh.exe"],
   },
   {
     label: "Discord",
     platform: "windows",
     cyborgId: "cyborg-discord-windows",
     cyroId: "cyro-discord-windows",
+    appNames: ["Discord.exe"],
   },
   {
     label: "Obsidian",
     platform: "windows",
     cyborgId: "cyborg-obsidian-windows",
     cyroId: "cyro-obsidian-windows",
+    appNames: ["Obsidian.exe"],
   },
   {
     label: "Spotify",
     platform: "windows",
     cyborgId: "cyborg-spotify-windows",
     cyroId: "cyro-spotify-windows",
+    appNames: ["Spotify.exe"],
   },
 ];
 
@@ -69,6 +83,19 @@ export default function App(): JSX.Element {
 
   useEffect(() => {
     loadImportedProfiles().then(setImportedProfiles);
+  }, []);
+
+  useEffect(() => {
+    const windowsDefaultIdx = PROFILE_PAIRS.findIndex(
+      (p) => p.label === "Windows Default",
+    );
+    window.keybindsApi.onActiveApp((processName) => {
+      const idx = PROFILE_PAIRS.findIndex((p) =>
+        p.appNames.some((n) => n.toLowerCase() === processName.toLowerCase()),
+      );
+      setActiveTab(idx >= 0 ? idx : windowsDefaultIdx);
+    });
+    return () => window.keybindsApi.removeActiveAppListener();
   }, []);
 
   const importedGroups = useMemo(() => {

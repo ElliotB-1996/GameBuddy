@@ -8,25 +8,22 @@ export const CYBORG_GRID: GridRow[] = [
   [null, "37", "38", "13", "18", null],
 ];
 
-export const CYBORG_JOYSTICK = {
-  up: "28",
-  down: "30",
-  left: "29",
-  right: "31",
-};
+export type ThumbCell = { id: string; dir: string } | null;
 
-export const CYBORG_THUMB: { id: string; dir: string }[][] = [
+export const CYBORG_THUMB: ThumbCell[][] = [
   [
     { id: "22", dir: "◉" },
-    { id: "41", dir: "↗" },
-  ],
-  [
+    { id: "28", dir: "↑" },
     { id: "29", dir: "←" },
+    { id: "30", dir: "↓" },
     { id: "31", dir: "→" },
   ],
   [
-    { id: "23", dir: "↓" },
+    { id: "41", dir: "↗" },
+    { id: "23", dir: "◉" },
     { id: "20", dir: "↘" },
+    null,
+    null,
   ],
 ];
 

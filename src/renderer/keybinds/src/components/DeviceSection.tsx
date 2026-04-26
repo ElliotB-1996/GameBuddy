@@ -16,14 +16,24 @@ export default function DeviceSection({
   activeZone,
   className,
 }: Props): JSX.Element {
-  const [activeLayer, setActiveLayer] = useState<"default" | "shift">(
-    "default",
-  );
+  const [activeLayer, setActiveLayer] = useState<string>("default");
 
+  const layerKeys = [
+    "default",
+    ...Object.keys(profile.layers).filter((k) => k !== "default"),
+  ];
   const layer = profile.layers[activeLayer] ?? profile.layers.default;
   const grid = profile.device === "cyborg" ? CYBORG_GRID : CYRO_GRID;
   const gridClass = profile.device === "cyborg" ? "cyborg-grid" : "cyro-grid";
-  const hasShift = !!profile.layers.shift;
+
+  function layerLabel(key: string): string {
+    if (profile.layerLabels?.[key]) return profile.layerLabels[key];
+    if (key === "default") return "Default";
+    if (key === "shift") return "Shift";
+    const m = /^shift-(\d+)$/.exec(key);
+    if (m) return `Shift ${m[1]}`;
+    return key;
+  }
 
   return (
     <div className={`device-section ${className ?? ""}`}>
@@ -31,21 +41,18 @@ export default function DeviceSection({
         <div className="device-title">
           {profile.device === "cyborg" ? "Azeron Cyborg V2" : "Azeron Cyro"}
         </div>
-        {hasShift && (
+        {layerKeys.length > 1 && (
           <div className="layer-selector">
             <span>Layer</span>
-            <button
-              className={`layer-btn ${activeLayer === "default" ? "active" : ""}`}
-              onClick={() => setActiveLayer("default")}
-            >
-              Default
-            </button>
-            <button
-              className={`layer-btn ${activeLayer === "shift" ? "active" : ""}`}
-              onClick={() => setActiveLayer("shift")}
-            >
-              Shift
-            </button>
+            {layerKeys.map((key) => (
+              <button
+                key={key}
+                className={`layer-btn ${activeLayer === key ? "active" : ""}`}
+                onClick={() => setActiveLayer(key)}
+              >
+                {layerLabel(key)}
+              </button>
+            ))}
           </div>
         )}
       </div>

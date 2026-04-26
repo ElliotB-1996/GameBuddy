@@ -34,8 +34,9 @@ export interface Profile {
   pairId?: string;
   layers: {
     default: Layer;
-    shift?: Layer;
+    [key: string]: Layer | undefined;
   };
+  layerLabels?: Record<string, string>;
   radialMenus?: RadialMenu[];
   notes?: string;
   imported?: true;

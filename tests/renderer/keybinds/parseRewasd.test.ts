@@ -183,6 +183,30 @@ describe('parseRewasd mask-based (WoW-style)', () => {
     expect(cyro.layers.default['1'].bindings.single).toBe('3')
   })
 
+  it('maps mouse buttonId 1 to LClick', () => {
+    const fixture = {
+      ...MASK_FIXTURE,
+      mappings: [{
+        condition: { mask: { id: 1, activator: { type: 'single' } } },
+        macros: [{ mouse: { buttonId: 1 } }],
+      }],
+    }
+    const cyborg = parseRewasd(fixture).find(p => p.device === 'cyborg')!
+    expect(cyborg.layers.default['1'].bindings.single).toBe('LClick')
+  })
+
+  it('maps mouse buttonId 2 to RClick', () => {
+    const fixture = {
+      ...MASK_FIXTURE,
+      mappings: [{
+        condition: { mask: { id: 1, activator: { type: 'single' } } },
+        macros: [{ mouse: { buttonId: 2 } }],
+      }],
+    }
+    const cyborg = parseRewasd(fixture).find(p => p.device === 'cyborg')!
+    expect(cyborg.layers.default['1'].bindings.single).toBe('RClick')
+  })
+
   it('converts DIK modifier + key into Ctrl+x style binding', () => {
     const fixture = {
       ...MASK_FIXTURE,
@@ -196,6 +220,143 @@ describe('parseRewasd mask-based (WoW-style)', () => {
     }
     const cyborg = parseRewasd(fixture).find(p => p.device === 'cyborg')!
     expect(cyborg.layers.default['1'].bindings.single).toBe('Ctrl+F')
+  })
+})
+
+describe('CYRO_BTN coverage — previously unmapped buttons', () => {
+  const fixture = {
+    config: { appName: 'Test' },
+    devices: { hardware: [{ id: 1, name: 'gamepad' }, { id: 2, name: 'gamepad' }] },
+    masks: [
+      { id: 1, set: [{ deviceId: 2, buttonId: 14 }] },
+      { id: 2, set: [{ deviceId: 2, buttonId: 6 }] },
+      { id: 3, set: [{ deviceId: 2, buttonId: 5 }] },
+      { id: 4, set: [{ deviceId: 2, buttonId: 2 }] },
+      { id: 5, set: [{ deviceId: 2, buttonId: 1 }] },
+    ],
+    mappings: [
+      { condition: { mask: { id: 1 } }, macros: [{ keyboard: { buttonId: 0, description: 'DIK_A' } }] },
+      { condition: { mask: { id: 2 } }, macros: [{ keyboard: { buttonId: 0, description: 'DIK_B' } }] },
+      { condition: { mask: { id: 3 } }, macros: [{ keyboard: { buttonId: 0, description: 'DIK_C' } }] },
+      { condition: { mask: { id: 4 } }, macros: [{ keyboard: { buttonId: 0, description: 'DIK_D' } }] },
+      { condition: { mask: { id: 5 } }, macros: [{ keyboard: { buttonId: 0, description: 'DIK_E' } }] },
+    ],
+  }
+
+  it('maps reWASD buttonId 14 → Azeron "7"', () => {
+    const cyro = parseRewasd(fixture).find(p => p.device === 'cyro')!
+    expect(cyro.layers.default['7']).toBeDefined()
+  })
+  it('maps reWASD buttonId 6 → Azeron "11"', () => {
+    const cyro = parseRewasd(fixture).find(p => p.device === 'cyro')!
+    expect(cyro.layers.default['11']).toBeDefined()
+  })
+  it('maps reWASD buttonId 5 → Azeron "12"', () => {
+    const cyro = parseRewasd(fixture).find(p => p.device === 'cyro')!
+    expect(cyro.layers.default['12']).toBeDefined()
+  })
+  it('maps reWASD buttonId 2 → Azeron "16"', () => {
+    const cyro = parseRewasd(fixture).find(p => p.device === 'cyro')!
+    expect(cyro.layers.default['16']).toBeDefined()
+  })
+  it('maps reWASD buttonId 1 → Azeron "17"', () => {
+    const cyro = parseRewasd(fixture).find(p => p.device === 'cyro')!
+    expect(cyro.layers.default['17']).toBeDefined()
+  })
+})
+
+const MULTI_SHIFT_FIXTURE = {
+  config: { appName: 'Minecraft' },
+  devices: { hardware: [{ id: 1, name: 'gamepad' }, { id: 2, name: 'gamepad' }] },
+  shifts: [
+    { id: 1, type: 'default' },
+    { id: 2, type: 'default', description: 'Letters A-F' },
+    { id: 3, type: 'default', description: 'Letters G-L' },
+  ],
+  masks: [
+    { id: 1, set: [{ deviceId: 1, buttonId: 1 }] },
+    { id: 2, set: [{ deviceId: 1, buttonId: 5 }] },
+  ],
+  mappings: [
+    { condition: { mask: { id: 1, activator: { type: 'single' } } }, macros: [{ keyboard: { buttonId: 2, description: 'DIK_1' } }] },
+    { condition: { shiftId: 1, mask: { id: 1, activator: { type: 'single' } } }, macros: [{ keyboard: { buttonId: 30, description: 'DIK_A' } }] },
+    { condition: { shiftId: 2, mask: { id: 2, activator: { type: 'single' } } }, macros: [{ keyboard: { buttonId: 48, description: 'DIK_B' } }] },
+    { condition: { shiftId: 3, mask: { id: 1, activator: { type: 'single' } } }, macros: [{ keyboard: { buttonId: 34, description: 'DIK_G' } }] },
+  ],
+}
+
+describe('parseRewasd multi-shift layers', () => {
+  it('creates a separate layer for each distinct shiftId', () => {
+    const cyborg = parseRewasd(MULTI_SHIFT_FIXTURE).find(p => p.device === 'cyborg')!
+    expect(Object.keys(cyborg.layers)).toEqual(['default', 'shift', 'shift-2', 'shift-3'])
+  })
+
+  it('populates each shift layer independently', () => {
+    const cyborg = parseRewasd(MULTI_SHIFT_FIXTURE).find(p => p.device === 'cyborg')!
+    expect(cyborg.layers['shift']?.['1'].bindings.single).toBe('A')
+    expect(cyborg.layers['shift-3']?.['1'].bindings.single).toBe('G')
+  })
+
+  it('stores shift descriptions in layerLabels keyed by layer key', () => {
+    const cyborg = parseRewasd(MULTI_SHIFT_FIXTURE).find(p => p.device === 'cyborg')!
+    expect(cyborg.layerLabels?.['shift-2']).toBe('Letters A-F')
+    expect(cyborg.layerLabels?.['shift-3']).toBe('Letters G-L')
+  })
+
+  it('omits layerLabels when no shift has a description', () => {
+    const fixture = { ...MULTI_SHIFT_FIXTURE, shifts: [{ id: 1, type: 'default' }] }
+    const cyborg = parseRewasd(fixture).find(p => p.device === 'cyborg')!
+    expect(cyborg.layerLabels).toBeUndefined()
+  })
+
+  it('maps layer-switch triggers as buttons with "→ LayerName" binding', () => {
+    const fixture = {
+      config: { appName: 'Test' },
+      devices: { hardware: [{ id: 1, name: 'gamepad' }] },
+      shifts: [
+        { id: 1, type: 'default' },
+        { id: 2, type: 'default', description: 'Letters A-F' },
+      ],
+      masks: [{ id: 1, set: [{ deviceId: 1, buttonId: 1 }] }],
+      mappings: [
+        // default layer: hold button 1 to jump to shift 2
+        { condition: { mask: { id: 1, activator: { type: 'single' } } }, jumpToLayer: { layer: 2 } },
+      ],
+    }
+    const cyborg = parseRewasd(fixture).find(p => p.device === 'cyborg')!
+    expect(cyborg.layers.default['1'].bindings.single).toBe('→ Letters A-F')
+  })
+
+  it('maps jumpToLayer 0 as "→ Default"', () => {
+    const fixture = {
+      config: { appName: 'Test' },
+      devices: { hardware: [{ id: 1, name: 'gamepad' }] },
+      shifts: [{ id: 1, type: 'default' }],
+      masks: [{ id: 1, set: [{ deviceId: 1, buttonId: 1 }] }],
+      mappings: [
+        { condition: { shiftId: 1, mask: { id: 1, activator: { type: 'single' } } }, jumpToLayer: { layer: 0 } },
+      ],
+    }
+    const cyborg = parseRewasd(fixture).find(p => p.device === 'cyborg')!
+    expect(cyborg.layers['shift']?.['1'].bindings.single).toBe('→ Default')
+  })
+
+  it('skips radial-menu jumpToLayer triggers in button grid', () => {
+    const fixture = {
+      ...RADIAL_FIXTURE,
+      masks: [
+        ...RADIAL_FIXTURE.masks,
+        { id: 10, set: [{ deviceId: 1, buttonId: 2 }] },
+      ],
+      mappings: [
+        ...RADIAL_FIXTURE.mappings,
+        // this jumps to the radial shift (id 3) — should not appear as a button
+        { condition: { mask: { id: 10, activator: { type: 'single' } } }, jumpToLayer: { layer: 3 } },
+      ],
+    }
+    const profile = parseRewasd(fixture)[0]
+    // button #5 (Azeron mapping for reWASD buttonId 2) should NOT exist in default layer
+    expect(profile.layers.default?.['5']).toBeUndefined()
   })
 })
 

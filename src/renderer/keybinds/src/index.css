@@ -116,8 +116,9 @@ body {
 .tbtn {
   width: 80px; height: 60px; border-radius: 5px; display: flex; flex-direction: column;
   align-items: center; justify-content: center; padding: 3px;
-  border: 1px solid transparent; transition: opacity 0.15s;
+  border: 1px solid transparent; transition: opacity 0.15s; position: relative;
 }
+.tbtn:hover .btn-tip { display: block; }
 .tbtn .dir   { font-size: 26px; color: #4c1d95; line-height: 1; margin-bottom: 2px; }
 .tbtn .label { font-size: 10px; font-weight: 600; text-align: center; line-height: 1.2; }
 .tbtn .num   { font-size: 9px; color: #f97316; margin-top: 2px; }

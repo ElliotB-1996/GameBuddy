@@ -18,7 +18,13 @@ export const CYBORG_THUMB: ThumbCell[][] = [
     { id: "30", dir: "↓" },
     { id: "31", dir: "→" },
   ],
-  [null, { id: "41", dir: "↗" }, { id: "23", dir: "◉" }, { id: "20", dir: "↘" }, null],
+  [
+    null,
+    { id: "41", dir: "↗" },
+    { id: "23", dir: "◉" },
+    { id: "20", dir: "↘" },
+    null,
+  ],
 ];
 
 export const CYRO_GRID: GridRow[] = [

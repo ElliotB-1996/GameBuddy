@@ -33,6 +33,26 @@ function TBtn({ id, dir, layer, activeZone }: TBtnProps): JSX.Element {
       <span className="dir">{dir}</span>
       <span className="label">{btn.label}</span>
       <span className="num">#{id}</span>
+      <div className="btn-tip">
+        {btn.bindings.single && (
+          <div className="tip-row">
+            <span className="tip-type">Single</span>
+            <span className="tip-binding">{btn.bindings.single}</span>
+          </div>
+        )}
+        {btn.bindings.long && (
+          <div className="tip-row">
+            <span className="tip-type">Long</span>
+            <span className="tip-binding">{btn.bindings.long}</span>
+          </div>
+        )}
+        {btn.bindings.double && (
+          <div className="tip-row">
+            <span className="tip-type">Double</span>
+            <span className="tip-binding">{btn.bindings.double}</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

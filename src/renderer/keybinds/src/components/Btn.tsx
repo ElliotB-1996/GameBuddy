@@ -4,9 +4,17 @@ interface Props {
   id: string;
   button?: Button;
   activeZone: Zone | null;
+  isEditing?: boolean;
+  onEditButton?: (id: string, rect: DOMRect) => void;
 }
 
-export default function Btn({ id, button, activeZone }: Props): JSX.Element {
+export default function Btn({
+  id,
+  button,
+  activeZone,
+  isEditing,
+  onEditButton,
+}: Props): JSX.Element {
   if (!button) {
     return (
       <div className="btn empty">
@@ -20,8 +28,19 @@ export default function Btn({ id, button, activeZone }: Props): JSX.Element {
   const dimmed =
     activeZone !== null && activeZone !== zone ? { opacity: 0.1 } : undefined;
 
+  function handleClick(e: React.MouseEvent<HTMLDivElement>): void {
+    if (isEditing && onEditButton) {
+      onEditButton(id, e.currentTarget.getBoundingClientRect());
+    }
+  }
+
   return (
-    <div className={`btn z-${zone}`} style={dimmed} data-zone={zone}>
+    <div
+      className={`btn z-${zone}${isEditing ? " btn--editing" : ""}`}
+      style={dimmed}
+      data-zone={zone}
+      onClick={handleClick}
+    >
       <span className="label">{label}</span>
       <span className="num">#{id}</span>
       <div className="btn-tip">

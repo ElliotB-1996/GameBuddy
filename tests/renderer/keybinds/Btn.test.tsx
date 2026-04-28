@@ -1,5 +1,6 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import Btn from "@keybinds/components/Btn";
 
 describe("Btn", () => {
@@ -61,5 +62,59 @@ describe("Btn", () => {
     expect(screen.getByText("Win+1")).toBeInTheDocument();
     expect(screen.getByText("Win+Shift+1")).toBeInTheDocument();
     expect(screen.getByText("Win+Alt+1")).toBeInTheDocument();
+  });
+
+  it("adds btn--editing class when isEditing is true", () => {
+    render(
+      <Btn
+        id="3"
+        button={{ zone: "edit", label: "Copy", bindings: {} }}
+        activeZone={null}
+        isEditing={true}
+      />,
+    );
+    expect(document.querySelector(".btn--editing")).toBeTruthy();
+  });
+
+  it("does not add btn--editing class when isEditing is false", () => {
+    render(
+      <Btn
+        id="3"
+        button={{ zone: "edit", label: "Copy", bindings: {} }}
+        activeZone={null}
+        isEditing={false}
+      />,
+    );
+    expect(document.querySelector(".btn--editing")).toBeNull();
+  });
+
+  it("fires onEditButton with id and rect when clicked in edit mode", async () => {
+    const onEditButton = vi.fn();
+    render(
+      <Btn
+        id="3"
+        button={{ zone: "edit", label: "Copy", bindings: { single: "Ctrl+C" } }}
+        activeZone={null}
+        isEditing={true}
+        onEditButton={onEditButton}
+      />,
+    );
+    await userEvent.click(document.querySelector(".btn")!);
+    expect(onEditButton).toHaveBeenCalledWith("3", expect.any(Object));
+  });
+
+  it("does not fire onEditButton when isEditing is false", async () => {
+    const onEditButton = vi.fn();
+    render(
+      <Btn
+        id="3"
+        button={{ zone: "edit", label: "Copy", bindings: { single: "Ctrl+C" } }}
+        activeZone={null}
+        isEditing={false}
+        onEditButton={onEditButton}
+      />,
+    );
+    await userEvent.click(document.querySelector(".btn")!);
+    expect(onEditButton).not.toHaveBeenCalled();
   });
 });

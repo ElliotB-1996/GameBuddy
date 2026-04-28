@@ -80,6 +80,10 @@ export default function App(): JSX.Element {
   const [activeTab, setActiveTab] = useState(0);
   const [activeZone, setActiveZone] = useState<Zone | null>(null);
   const [importedProfiles, setImportedProfiles] = useState<Profile[]>([]);
+  const importedProfilesRef = useRef<Profile[]>([]);
+  useEffect(() => {
+    importedProfilesRef.current = importedProfiles;
+  }, [importedProfiles]);
   const [importError, setImportError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -159,7 +163,9 @@ export default function App(): JSX.Element {
     buttonId: string,
     updated: Button,
   ): Promise<void> {
-    const current = resolveProfile(profileId);
+    const current =
+      importedProfilesRef.current.find((p) => p.id === profileId) ??
+      profiles.find((p) => p.id === profileId);
     if (!current) return;
     const next: Profile = {
       ...current,

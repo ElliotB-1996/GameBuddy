@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import "./index.css";
 import { profiles } from "./data/profiles";
-import type { Zone, Profile } from "./data/types";
+import type { Zone, Profile, Button } from "./data/types";
 import Legend from "./components/Legend";
 import DeviceSection from "./components/DeviceSection";
 import RadialMenus from "./components/RadialMenus";
@@ -74,6 +74,8 @@ const PROFILE_PAIRS = [
   },
 ];
 
+const BUILTIN_IDS = new Set(profiles.map((p) => p.id));
+
 export default function App(): JSX.Element {
   const [activeTab, setActiveTab] = useState(0);
   const [activeZone, setActiveZone] = useState<Zone | null>(null);
@@ -98,9 +100,17 @@ export default function App(): JSX.Element {
     return () => window.keybindsApi.removeActiveAppListener();
   }, []);
 
+  function resolveProfile(id: string): Profile | undefined {
+    return (
+      importedProfiles.find((p) => p.id === id) ??
+      profiles.find((p) => p.id === id)
+    );
+  }
+
   const importedGroups = useMemo(() => {
     const seen = new Map<string, Profile[]>();
     for (const p of importedProfiles) {
+      if (BUILTIN_IDS.has(p.id)) continue;
       const key = p.pairId ?? p.id;
       if (!seen.has(key)) seen.set(key, []);
       seen.get(key)!.push(p);
@@ -143,6 +153,36 @@ export default function App(): JSX.Element {
     }
   }
 
+  async function handleButtonSave(
+    profileId: string,
+    layerKey: string,
+    buttonId: string,
+    updated: Button,
+  ): Promise<void> {
+    const current = resolveProfile(profileId);
+    if (!current) return;
+    const next: Profile = {
+      ...current,
+      layers: {
+        ...current.layers,
+        [layerKey]: {
+          ...current.layers[layerKey],
+          [buttonId]: updated,
+        },
+      },
+    };
+    await saveProfile(next);
+    setImportedProfiles((prev) => {
+      const idx = prev.findIndex((p) => p.id === profileId);
+      if (idx >= 0) {
+        const copy = [...prev];
+        copy[idx] = next;
+        return copy;
+      }
+      return [...prev, next];
+    });
+  }
+
   const isImportedTab = activeTab >= PROFILE_PAIRS.length;
   const importedGroup = isImportedTab
     ? importedGroups[activeTab - PROFILE_PAIRS.length]
@@ -150,10 +190,8 @@ export default function App(): JSX.Element {
   const importedCyborg = importedGroup?.find((p) => p.device === "cyborg");
   const importedCyro = importedGroup?.find((p) => p.device === "cyro");
   const pair = !isImportedTab ? PROFILE_PAIRS[activeTab] : null;
-  const cyborg = pair
-    ? profiles.find((p) => p.id === pair.cyborgId)
-    : undefined;
-  const cyro = pair ? profiles.find((p) => p.id === pair.cyroId) : undefined;
+  const cyborg = pair ? resolveProfile(pair.cyborgId) : undefined;
+  const cyro = pair ? resolveProfile(pair.cyroId) : undefined;
 
   return (
     <>
@@ -231,6 +269,7 @@ export default function App(): JSX.Element {
                 <DeviceSection
                   profile={importedCyborg}
                   activeZone={activeZone}
+                  onSave={handleButtonSave}
                 />
               )}
               <div className="right-col">
@@ -239,6 +278,7 @@ export default function App(): JSX.Element {
                     profile={importedCyro}
                     activeZone={activeZone}
                     className="column"
+                    onSave={handleButtonSave}
                   />
                 )}
                 <RadialMenus
@@ -249,7 +289,11 @@ export default function App(): JSX.Element {
           ) : (
             <>
               {cyborg && (
-                <DeviceSection profile={cyborg} activeZone={activeZone} />
+                <DeviceSection
+                  profile={cyborg}
+                  activeZone={activeZone}
+                  onSave={handleButtonSave}
+                />
               )}
               <div className="right-col">
                 {cyro && (
@@ -257,6 +301,7 @@ export default function App(): JSX.Element {
                     profile={cyro}
                     activeZone={activeZone}
                     className="column"
+                    onSave={handleButtonSave}
                   />
                 )}
                 <RadialMenus menus={cyborg?.radialMenus ?? []} />

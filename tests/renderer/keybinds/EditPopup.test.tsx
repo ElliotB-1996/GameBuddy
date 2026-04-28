@@ -17,7 +17,6 @@ describe("EditPopup", () => {
     render(
       <EditPopup
         buttonId="3"
-        layerKey="default"
         button={button}
         rect={rect}
         onSave={vi.fn()}
@@ -33,7 +32,6 @@ describe("EditPopup", () => {
     render(
       <EditPopup
         buttonId="3"
-        layerKey="default"
         button={button}
         rect={rect}
         onSave={vi.fn()}
@@ -48,7 +46,6 @@ describe("EditPopup", () => {
     render(
       <EditPopup
         buttonId="3"
-        layerKey="default"
         button={button}
         rect={rect}
         onSave={vi.fn()}
@@ -64,7 +61,6 @@ describe("EditPopup", () => {
     render(
       <EditPopup
         buttonId="3"
-        layerKey="default"
         button={button}
         rect={rect}
         onSave={vi.fn()}
@@ -80,7 +76,6 @@ describe("EditPopup", () => {
     render(
       <EditPopup
         buttonId="3"
-        layerKey="default"
         button={button}
         rect={rect}
         onSave={onSave}
@@ -100,7 +95,6 @@ describe("EditPopup", () => {
     render(
       <EditPopup
         buttonId="3"
-        layerKey="default"
         button={button}
         rect={rect}
         onSave={vi.fn()}
@@ -119,7 +113,7 @@ describe("EditPopup", () => {
     render(
       <EditPopup
         buttonId="3"
-        layerKey="default"
+
         button={{ zone: "edit", label: "Copy", bindings: { single: "Ctrl+C" } }}
         rect={rect}
         onSave={onSave}
@@ -140,7 +134,6 @@ describe("EditPopup", () => {
     render(
       <EditPopup
         buttonId="3"
-        layerKey="default"
         button={button}
         rect={rect}
         onSave={vi.fn()}

@@ -19,7 +19,6 @@ const POPUP_HEIGHT = 330;
 
 interface Props {
   buttonId: string;
-  layerKey: string; // consumed by parent's onSave callback; not used inside the popup
   button: Button;
   rect: DOMRect;
   onSave: (updated: Button) => void;

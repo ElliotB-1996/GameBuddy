@@ -104,6 +104,8 @@ export default function App(): JSX.Element {
     return () => window.keybindsApi.removeActiveAppListener();
   }, []);
 
+  // Reads from state snapshot — safe for render-time derivations (cyborg, cyro).
+  // Event handlers that need the latest value use importedProfilesRef.current directly.
   function resolveProfile(id: string): Profile | undefined {
     return (
       importedProfiles.find((p) => p.id === id) ??

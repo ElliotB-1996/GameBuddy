@@ -156,7 +156,6 @@ export default function DeviceSection({
       {editingButton && editingButtonData && (
         <EditPopup
           buttonId={editingButton.id}
-          layerKey={editingButton.layerKey}
           button={editingButtonData}
           rect={editingButton.rect}
           onSave={handlePopupSave}

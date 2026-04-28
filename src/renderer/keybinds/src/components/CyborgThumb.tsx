@@ -36,7 +36,10 @@ function TBtn({
 
   if (!btn)
     return (
-      <div className="tbtn z-thumb" onClick={handleClick}>
+      <div
+        className={`tbtn z-thumb${isEditing ? " tbtn--editing" : ""}`}
+        onClick={handleClick}
+      >
         <span className="dir">{dir}</span>
         <span className="label">—</span>
         <span className="num">#{id}</span>

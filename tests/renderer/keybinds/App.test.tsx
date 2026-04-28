@@ -81,13 +81,11 @@ describe("App — handleButtonSave", () => {
 
     // Click button #1 — find a .btn--editing element
     const editableBtns = document.querySelectorAll(".btn--editing");
-    if (editableBtns.length > 0) {
-      await userEvent.click(editableBtns[0]);
-      const saveBtn = document.querySelector(".edit-popup-save");
-      if (saveBtn) {
-        await userEvent.click(saveBtn);
-        expect((window as any).keybindsApi.saveProfile).toHaveBeenCalled();
-      }
-    }
+    expect(editableBtns.length).toBeGreaterThan(0); // edit mode must be active
+    await userEvent.click(editableBtns[0]);
+    const saveBtn = document.querySelector(".edit-popup-save");
+    expect(saveBtn).toBeTruthy(); // popup must have opened
+    await userEvent.click(saveBtn!);
+    expect((window as any).keybindsApi.saveProfile).toHaveBeenCalled();
   });
 });

@@ -4,9 +4,9 @@
       "Bash(npx vitest *)",
       "Bash(npm test *)",
       "PowerShell(npm run *)",
-      "Bash(git *)",
       "PowerShell(git *)"
-    ]
+    ],
+    "defaultMode": "acceptEdits"
   },
   "defaultShell": "powershell",
   "prefersReducedMotion": false

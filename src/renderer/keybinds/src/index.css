@@ -165,3 +165,35 @@ body {
 .notes-body pre { font-size: 13px; line-height: 1.7; font-family: 'Cascadia Code', 'Fira Code', monospace; color: #94a3b8; white-space: pre-wrap; }
 .jk { color: #7dd3fc; }
 .js { color: #86efac; }
+
+/* ── Edit mode ── */
+.device-section.editing { border-color: #4c1d95; box-shadow: 0 0 0 1px #4c1d9533; }
+.edit-hint { font-size: 10px; color: #6d5fa8; font-style: italic; margin-bottom: 8px; }
+.edit-toggle { padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid #2d1b69; background: transparent; color: #4c1d95; display: flex; align-items: center; gap: 4px; margin-left: 8px; }
+.edit-toggle.active { background: #2d1b69; color: #a78bfa; border-color: #a78bfa; }
+.btn--editing { cursor: pointer; }
+.btn--editing:hover { border-color: #a78bfa !important; box-shadow: 0 0 0 1px #a78bfa44; }
+.tbtn--editing { cursor: pointer; }
+.tbtn--editing:hover { border-color: #a78bfa !important; box-shadow: 0 0 0 1px #a78bfa44; }
+
+/* ── Edit popup ── */
+.edit-popup { position: fixed; z-index: 1000; background: #12122a; border: 1px solid #2d2060; border-radius: 8px; padding: 14px; width: 240px; box-shadow: 0 8px 32px #000d; font-family: 'Segoe UI', system-ui, sans-serif; color: #e2e8f0; }
+.edit-popup-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.edit-popup-header span { font-size: 11px; color: #a78bfa; text-transform: uppercase; letter-spacing: 1px; }
+.edit-popup-close { background: none; border: none; color: #4c1d95; cursor: pointer; font-size: 14px; padding: 0; line-height: 1; }
+.edit-popup-close:hover { color: #f87171; }
+.edit-popup-label { display: block; font-size: 9px; color: #4c1d95; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.edit-popup-input { width: 100%; background: #0d0d1a; border: 1px solid #2d2060; border-radius: 4px; padding: 5px 8px; font-size: 12px; color: #e2e8f0; outline: none; font-family: inherit; margin-bottom: 9px; box-sizing: border-box; }
+.edit-popup-input:focus { border-color: #4c1d95; }
+.edit-popup-zones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; margin-bottom: 9px; }
+.edit-popup-zone { padding: 3px 0; border-radius: 3px; font-size: 9px; font-weight: 700; cursor: pointer; border: 1px solid transparent; text-align: center; transition: border-color 0.1s; }
+.edit-popup-zone.selected { border-color: #a78bfa !important; border-width: 2px; }
+.edit-popup-bindings { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.edit-popup-binding-row { display: flex; align-items: center; gap: 6px; }
+.edit-popup-binding-type { font-size: 9px; color: #6d5fa8; text-transform: uppercase; letter-spacing: 1px; width: 36px; text-align: right; flex-shrink: 0; }
+.edit-popup-binding-row .edit-popup-input { margin-bottom: 0; flex: 1; width: auto; }
+.edit-popup-actions { display: flex; gap: 6px; justify-content: flex-end; }
+.edit-popup-cancel { padding: 4px 10px; border-radius: 4px; font-size: 11px; background: transparent; border: 1px solid #2d1b69; color: #6d5fa8; cursor: pointer; }
+.edit-popup-cancel:hover { border-color: #4c1d95; color: #a78bfa; }
+.edit-popup-save { padding: 4px 10px; border-radius: 4px; font-size: 11px; background: #4c1d95; color: #e2e8f0; border: none; cursor: pointer; }
+.edit-popup-save:hover { background: #6d28d9; }

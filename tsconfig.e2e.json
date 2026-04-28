@@ -1,6 +1,6 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
-  "include": ["tests/e2e/**/*", "src/renderer/src/types.ts"],
+  "include": ["tests/e2e/**/*", "src/renderer/notes/src/types.ts"],
   "compilerOptions": {
     "outDir": "out/e2e",
     "rootDir": ".",

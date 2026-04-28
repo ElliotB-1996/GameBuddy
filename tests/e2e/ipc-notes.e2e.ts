@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
 import { launchApp } from "./helpers/launch";
-import type { AppData } from "../../src/renderer/src/types";
+import type { AppData } from "../../src/renderer/notes/src/types";
 
 const MAIN_PATH = join(__dirname, "../../out/main/index.js");
 

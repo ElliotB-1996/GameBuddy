@@ -29,7 +29,7 @@ export default defineConfig({
   renderer: {
     resolve: {
       alias: {
-        "@renderer": resolve("src/renderer/src"),
+        "@renderer": resolve("src/renderer/notes/src"),
         "@keybinds": resolve("src/renderer/keybinds/src"),
       },
     },
@@ -37,7 +37,7 @@ export default defineConfig({
     build: {
       rollupOptions: {
         input: {
-          index: resolve("src/renderer/index.html"),
+          index: resolve("src/renderer/notes/index.html"),
           keybinds: resolve("src/renderer/keybinds/index.html"),
         },
       },

@@ -10,9 +10,10 @@
       "8":  { "zone": "app", "label": "Terminal",  "bindings": { "single": "Ctrl+Alt+T" } },
       "12": { "zone": "app", "label": "Browser",   "bindings": { "single": "Ctrl+Alt+B" } },
       "13": { "zone": "app",   "label": "Discord",   "bindings": { "single": "Ctrl+Alt+D" } },
+      "20": { "zone": "app",   "label": "Azeron",   "bindings": { "single": "Ctrl+Alt+A" } },
       "37": { "zone": "thumb", "label": "Esc",       "bindings": { "single": "Escape" } },
       "17": { "zone": "app", "label": "Claude",    "bindings": { "single": "Ctrl+Alt+C" } },
-      "38": { "zone": "app", "label": "Obsidian",  "bindings": { "single": "Ctrl+Alt+O" } }
+      "41": { "zone": "app", "label": "ReWasd",  "bindings": { "single": "Ctrl+Alt+R" } }
     }
   }
 }

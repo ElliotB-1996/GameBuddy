@@ -1,7 +1,7 @@
 import { ipcMain, app } from "electron";
 import { join } from "path";
 import { loadNotes, saveNotes } from "../store/notes-store";
-import type { AppData } from "../../renderer/src/types";
+import type { AppData } from "../../renderer/notes/src/types";
 
 export function registerNotesHandlers(): {
   initialData: AppData;

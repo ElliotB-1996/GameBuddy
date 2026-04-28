@@ -17,7 +17,7 @@ import {
   registerGlobalHotkeys,
   unregisterGlobalHotkeys,
 } from "../../src/main/ipc/hotkeys-handler";
-import type { Hotkeys } from "../../src/renderer/src/types";
+import type { Hotkeys } from "../../src/renderer/notes/src/types";
 
 const makeWin = () => ({
   isVisible: vi.fn().mockReturnValue(true),

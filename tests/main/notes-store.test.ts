@@ -8,7 +8,7 @@ import {
   DEFAULT_APP_DATA,
   DEFAULT_APPEARANCE,
 } from "../../src/main/store/notes-store";
-import type { AppData } from "../../src/renderer/src/types";
+import type { AppData } from "../../src/renderer/notes/src/types";
 
 let tempDir: string;
 

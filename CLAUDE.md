@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+Use the PowerShell tool for all shell commands — do not use the Bash tool
+
 Run lint as you go and fix any warnings immediately
 
 Write unit tests for each task as you implement it, but only run the full test suite at the end of a feature (not after every task)

@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import type { AppData, Hotkeys, WindowMode } from "../renderer/src/types";
+import type { AppData, Hotkeys, WindowMode } from "../renderer/notes/src/types";
 
 const api = {
   // Main → Renderer events

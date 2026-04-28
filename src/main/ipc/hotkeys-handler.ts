@@ -1,5 +1,5 @@
 import { ipcMain, globalShortcut, BrowserWindow } from "electron";
-import type { Hotkeys } from "../../renderer/src/types";
+import type { Hotkeys } from "../../renderer/notes/src/types";
 
 export function buildAccelerator(hotkey: string): string {
   return hotkey;

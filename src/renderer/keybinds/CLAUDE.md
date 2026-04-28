@@ -35,3 +35,9 @@ Replaces idb. Three functions backed by `window.keybindsApi`:
 - `deleteProfile(id)` — removes via `keybinds:delete`
 
 The `window.keybindsApi` type is declared in `src/env.d.ts` and backed by `src/preload/keybinds.ts`.
+
+## Edit mode & built-in profile overrides
+
+Buttons in each `DeviceSection` can be edited in-place. Clicking the **Edit** toggle enters edit mode; clicking a button opens `EditPopup` (a `ReactDOM.createPortal` to `document.body`).
+
+Built-in profiles (bundled via `import.meta.glob`) cannot be written at runtime. When a user edits a built-in button, the entire profile is saved to `userData/profiles.json` under the **same `id`**. `App.tsx` resolves the correct version via `resolveProfile(id)`, which prefers any matching entry in `importedProfiles` over the bundled copy. `BUILTIN_IDS` (module-level `Set`) prevents these overrides from appearing as extra tabs in `importedGroups`.

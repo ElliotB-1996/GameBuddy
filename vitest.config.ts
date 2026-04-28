@@ -10,7 +10,7 @@ export default defineConfig({
     globals: true,
     include: ["tests/**/*.test.{ts,tsx}"],
     alias: {
-      "@renderer": resolve(__dirname, "src/renderer/src"),
+      "@renderer": resolve(__dirname, "src/renderer/notes/src"),
       "@keybinds": resolve(__dirname, "src/renderer/keybinds/src"),
     },
   },

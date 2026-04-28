@@ -10,3 +10,4 @@ test_output.txt
 resources/models/
 playwright-report/
 test-results/
+.superpowers-*.txt

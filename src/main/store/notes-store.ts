@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync, mkdirSync } from "fs";
 import { dirname } from "path";
-import type { AppData, Appearance } from "../../renderer/src/types";
+import type { AppData, Appearance } from "../../renderer/notes/src/types";
 
 export const DEFAULT_APPEARANCE: Appearance = {
   bgColor: "#0a0c10",

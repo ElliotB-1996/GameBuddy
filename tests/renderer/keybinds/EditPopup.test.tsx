@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import EditPopup from "@keybinds/components/EditPopup";
 import type { Button } from "@keybinds/data/types";
@@ -133,5 +133,21 @@ describe("EditPopup", () => {
     const saved = onSave.mock.calls[0][0] as Button;
     expect(saved.bindings.long).toBeUndefined();
     expect(saved.bindings.double).toBeUndefined();
+  });
+
+  it("calls onClose when clicking outside the popup", async () => {
+    const onClose = vi.fn();
+    render(
+      <EditPopup
+        buttonId="3"
+        layerKey="default"
+        button={button}
+        rect={rect}
+        onSave={vi.fn()}
+        onClose={onClose}
+      />,
+    );
+    fireEvent.mouseDown(document.body);
+    expect(onClose).toHaveBeenCalled();
   });
 });

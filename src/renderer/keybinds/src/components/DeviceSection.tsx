@@ -86,7 +86,7 @@ export default function DeviceSection({
 
   return (
     <div
-      className={`device-section ${className ?? ""}${isEditing ? " editing" : ""}`}
+      className={`device-section${className ? ` ${className}` : ""}${isEditing ? " editing" : ""}`}
     >
       <div className="device-header">
         <div className="device-title">

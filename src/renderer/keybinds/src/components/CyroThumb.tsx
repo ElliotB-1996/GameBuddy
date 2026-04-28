@@ -4,9 +4,16 @@ import { CYRO_THUMB } from "../data/layout";
 interface Props {
   layer: Layer;
   activeZone: Zone | null;
+  isEditing?: boolean;
+  onEditButton?: (id: string, rect: DOMRect) => void;
 }
 
-export default function CyroThumb({ layer, activeZone }: Props): JSX.Element {
+export default function CyroThumb({
+  layer,
+  activeZone,
+  isEditing,
+  onEditButton,
+}: Props): JSX.Element {
   return (
     <div className="cyro-thumb thumb-area">
       <div
@@ -15,9 +22,16 @@ export default function CyroThumb({ layer, activeZone }: Props): JSX.Element {
       >
         {CYRO_THUMB.map(({ id, dir }) => {
           const btn = layer[id];
+
+          function handleClick(e: React.MouseEvent<HTMLDivElement>): void {
+            if (isEditing && onEditButton) {
+              onEditButton(id, e.currentTarget.getBoundingClientRect());
+            }
+          }
+
           if (!btn)
             return (
-              <div key={id} className="tbtn z-thumb">
+              <div key={id} className="tbtn z-thumb" onClick={handleClick}>
                 <span className="dir">{dir}</span>
                 <span className="label">—</span>
                 <span className="num">#{id}</span>
@@ -28,7 +42,12 @@ export default function CyroThumb({ layer, activeZone }: Props): JSX.Element {
               ? { opacity: 0.1 }
               : undefined;
           return (
-            <div key={id} className={`tbtn z-${btn.zone}`} style={dimmed}>
+            <div
+              key={id}
+              className={`tbtn z-${btn.zone}${isEditing ? " tbtn--editing" : ""}`}
+              style={dimmed}
+              onClick={handleClick}
+            >
               <span className="dir">{dir}</span>
               <span className="label">{btn.label}</span>
               <span className="num">#{id}</span>

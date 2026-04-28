@@ -5,6 +5,8 @@ import type { ThumbCell } from "../data/layout";
 interface Props {
   layer: Layer;
   activeZone: Zone | null;
+  isEditing?: boolean;
+  onEditButton?: (id: string, rect: DOMRect) => void;
 }
 
 interface TBtnProps {
@@ -12,13 +14,29 @@ interface TBtnProps {
   dir: string;
   layer: Layer;
   activeZone: Zone | null;
+  isEditing?: boolean;
+  onEditButton?: (id: string, rect: DOMRect) => void;
 }
 
-function TBtn({ id, dir, layer, activeZone }: TBtnProps): JSX.Element {
+function TBtn({
+  id,
+  dir,
+  layer,
+  activeZone,
+  isEditing,
+  onEditButton,
+}: TBtnProps): JSX.Element {
   const btn = layer[id];
+
+  function handleClick(e: React.MouseEvent<HTMLDivElement>): void {
+    if (isEditing && onEditButton) {
+      onEditButton(id, e.currentTarget.getBoundingClientRect());
+    }
+  }
+
   if (!btn)
     return (
-      <div className="tbtn z-thumb">
+      <div className="tbtn z-thumb" onClick={handleClick}>
         <span className="dir">{dir}</span>
         <span className="label">—</span>
         <span className="num">#{id}</span>
@@ -29,7 +47,11 @@ function TBtn({ id, dir, layer, activeZone }: TBtnProps): JSX.Element {
       ? { opacity: 0.1 }
       : undefined;
   return (
-    <div className={`tbtn z-${btn.zone}`} style={dimmed}>
+    <div
+      className={`tbtn z-${btn.zone}${isEditing ? " tbtn--editing" : ""}`}
+      style={dimmed}
+      onClick={handleClick}
+    >
       <span className="dir">{dir}</span>
       <span className="label">{btn.label}</span>
       <span className="num">#{id}</span>
@@ -57,7 +79,12 @@ function TBtn({ id, dir, layer, activeZone }: TBtnProps): JSX.Element {
   );
 }
 
-export default function CyborgThumb({ layer, activeZone }: Props): JSX.Element {
+export default function CyborgThumb({
+  layer,
+  activeZone,
+  isEditing,
+  onEditButton,
+}: Props): JSX.Element {
   return (
     <div className="thumb-area">
       <div
@@ -74,6 +101,8 @@ export default function CyborgThumb({ layer, activeZone }: Props): JSX.Element {
                 dir={cell.dir}
                 layer={layer}
                 activeZone={activeZone}
+                isEditing={isEditing}
+                onEditButton={onEditButton}
               />
             ) : (
               <div key={`sp-${ri}-${ci}`} />

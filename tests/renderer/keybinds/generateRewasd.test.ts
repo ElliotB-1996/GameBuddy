@@ -487,3 +487,132 @@ describe("generateRewasd — radial menus", () => {
     expect(file.radialMenuCircles?.[0].id).toBeDefined();
   });
 });
+
+describe("round-trip: generateRewasd → parseRewasd", () => {
+  it("keyboard binding survives round-trip", () => {
+    const profile: Profile = {
+      id: "rt-kb",
+      label: "RTKeyboard",
+      platform: "windows",
+      type: "rewasd",
+      device: "cyborg",
+      layers: {
+        default: {
+          "1": { zone: "unzoned", label: "Alpha", bindings: { single: "A" } },
+          "2": { zone: "unzoned", label: "Combo", bindings: { single: "Ctrl+Z" } },
+          "3": { zone: "unzoned", label: "Multi", bindings: { single: "Shift+Alt+K" } },
+        },
+      },
+    };
+    const reparsed = parseRewasd(generateRewasd([profile]));
+    const cyborg = reparsed.find((p) => p.device === "cyborg")!;
+    expect(cyborg.layers.default["1"]?.bindings.single).toBe("A");
+    expect(cyborg.layers.default["2"]?.bindings.single).toBe("Ctrl+Z");
+    expect(cyborg.layers.default["3"]?.bindings.single).toBe("Shift+Alt+K");
+  });
+
+  it("mouse bindings survive round-trip", () => {
+    const profile: Profile = {
+      id: "rt-mouse",
+      label: "RTMouse",
+      platform: "windows",
+      type: "rewasd",
+      device: "cyborg",
+      layers: {
+        default: {
+          "1": { zone: "unzoned", label: "LClick",    bindings: { single: "LClick" } },
+          "2": { zone: "unzoned", label: "MouseLeft", bindings: { single: "Mouse Left" } },
+          "3": { zone: "unzoned", label: "WheelUp",   bindings: { single: "Wheel Up" } },
+        },
+      },
+    };
+    const reparsed = parseRewasd(generateRewasd([profile]));
+    const cyborg = reparsed.find((p) => p.device === "cyborg")!;
+    expect(cyborg.layers.default["1"]?.bindings.single).toBe("LClick");
+    expect(cyborg.layers.default["2"]?.bindings.single).toBe("Mouse Left");
+    expect(cyborg.layers.default["3"]?.bindings.single).toBe("Wheel Up");
+  });
+
+  it("shift layer and layer-switch binding survive round-trip", () => {
+    const profile: Profile = {
+      id: "rt-shift",
+      label: "RTShift",
+      platform: "windows",
+      type: "rewasd",
+      device: "cyborg",
+      layerLabels: { shift: "Fn" },
+      layers: {
+        default: {
+          "1": { zone: "unzoned", label: "Alpha",    bindings: { single: "A" } },
+          "5": { zone: "unzoned", label: "GoToFn",   bindings: { single: "→ Fn" } },
+        },
+        shift: {
+          "1": { zone: "unzoned", label: "Beta",     bindings: { single: "B" } },
+          "5": { zone: "unzoned", label: "GoBack",   bindings: { single: "→ Default" } },
+        },
+      },
+    };
+    const reparsed = parseRewasd(generateRewasd([profile]));
+    const cyborg = reparsed.find((p) => p.device === "cyborg")!;
+    expect(cyborg.layers.default["1"]?.bindings.single).toBe("A");
+    expect(cyborg.layers.shift?.["1"]?.bindings.single).toBe("B");
+    // Layer switches produce "→ <name>" — just verify the prefix
+    expect(cyborg.layers.default["5"]?.bindings.single).toMatch(/^→/);
+    expect(cyborg.layers.shift?.["5"]?.bindings.single).toMatch(/^→/);
+  });
+
+  it("all 8 activator types survive round-trip", () => {
+    const profile: Profile = {
+      id: "rt-act",
+      label: "RTActivators",
+      platform: "windows",
+      type: "rewasd",
+      device: "cyborg",
+      layers: {
+        default: {
+          "1": {
+            zone: "unzoned",
+            label: "Multi",
+            bindings: {
+              single: "A", double: "B", triple: "C", long: "D",
+              down: "E", up: "F", turbo: "G", toggle: "H",
+            },
+          },
+        },
+      },
+    };
+    const reparsed = parseRewasd(generateRewasd([profile]));
+    const cyborg = reparsed.find((p) => p.device === "cyborg")!;
+    const b = cyborg.layers.default["1"]?.bindings;
+    expect(b?.single).toBe("A");
+    expect(b?.double).toBe("B");
+    expect(b?.triple).toBe("C");
+    expect(b?.long).toBe("D");
+    expect(b?.down).toBe("E");
+    expect(b?.up).toBe("F");
+    expect(b?.turbo).toBe("G");
+    expect(b?.toggle).toBe("H");
+  });
+
+  it("cyborg+cyro pair survives round-trip", () => {
+    const cyborg: Profile = {
+      id: "rt-cyborg",
+      label: "RTBoth",
+      platform: "windows",
+      type: "rewasd",
+      device: "cyborg",
+      layers: { default: { "1": { zone: "unzoned", label: "CyborgBtn", bindings: { single: "A" } } } },
+    };
+    const cyro: Profile = {
+      id: "rt-cyro",
+      label: "RTBoth",
+      platform: "windows",
+      type: "rewasd",
+      device: "cyro",
+      layers: { default: { "1": { zone: "unzoned", label: "CyroBtn", bindings: { single: "B" } } } },
+    };
+    const reparsed = parseRewasd(generateRewasd([cyborg, cyro]));
+    expect(reparsed.find((p) => p.device === "cyborg")?.layers.default["1"]?.bindings.single).toBe("A");
+    expect(reparsed.find((p) => p.device === "cyro")?.layers.default["1"]?.bindings.single).toBe("B");
+  });
+});

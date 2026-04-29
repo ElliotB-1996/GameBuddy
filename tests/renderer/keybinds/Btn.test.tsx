@@ -64,6 +64,25 @@ describe("Btn", () => {
     expect(screen.getByText("Win+Alt+1")).toBeInTheDocument();
   });
 
+  it("shows triple, down, up, turbo, and toggle bindings in tooltip", () => {
+    render(
+      <Btn
+        id="1"
+        button={{
+          zone: "app",
+          label: "Multi",
+          bindings: { triple: "T", down: "D", up: "U", turbo: "TB", toggle: "TG" },
+        }}
+        activeZone={null}
+      />,
+    );
+    expect(screen.getByText("T")).toBeInTheDocument();
+    expect(screen.getByText("D")).toBeInTheDocument();
+    expect(screen.getByText("U")).toBeInTheDocument();
+    expect(screen.getByText("TB")).toBeInTheDocument();
+    expect(screen.getByText("TG")).toBeInTheDocument();
+  });
+
   it("adds btn--editing class when isEditing is true", () => {
     render(
       <Btn

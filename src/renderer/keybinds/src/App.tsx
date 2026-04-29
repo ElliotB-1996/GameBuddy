@@ -8,6 +8,7 @@ import RadialMenus from "./components/RadialMenus";
 import { loadImportedProfiles, saveProfile, deleteProfile } from "./db";
 import { parseRewasd } from "./importers/parseRewasd";
 import { ParseError } from "./importers/errors";
+import { generateRewasd } from "./exporters/generateRewasd";
 
 const PROFILE_PAIRS = [
   {
@@ -191,6 +192,36 @@ export default function App(): JSX.Element {
     });
   }
 
+  function handleExport(): void {
+    const exportProfiles: Profile[] = [];
+    if (activeTab < PROFILE_PAIRS.length) {
+      const pair = PROFILE_PAIRS[activeTab];
+      const c = resolveProfile(pair.cyborgId);
+      const cr = resolveProfile(pair.cyroId);
+      if (c) exportProfiles.push(c);
+      if (cr) exportProfiles.push(cr);
+    } else {
+      const group = importedGroups[activeTab - PROFILE_PAIRS.length];
+      if (group) {
+        const cb = group.find((p) => p.device === "cyborg");
+        const cr = group.find((p) => p.device === "cyro");
+        if (cb) exportProfiles.push(cb);
+        if (cr) exportProfiles.push(cr);
+      }
+    }
+    if (exportProfiles.length === 0) return;
+
+    const file = generateRewasd(exportProfiles);
+    const json = JSON.stringify(file, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${exportProfiles[0].label}.rewasd`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   const isImportedTab = activeTab >= PROFILE_PAIRS.length;
   const importedGroup = isImportedTab
     ? importedGroups[activeTab - PROFILE_PAIRS.length]
@@ -257,6 +288,9 @@ export default function App(): JSX.Element {
             onClick={() => fileInputRef.current?.click()}
           >
             + Import
+          </button>
+          <button className="tab tab-export" onClick={handleExport}>
+            ↓ Export
           </button>
         </div>
       </header>

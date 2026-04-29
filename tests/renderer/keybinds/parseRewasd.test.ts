@@ -4,6 +4,7 @@ import { ParseError } from '@keybinds/importers/errors'
 
 const FIXTURE = {
   config: { appName: 'Visual Studio Code' },
+  devices: { hardware: [{ id: 1, name: 'gamepad' }, { id: 2, name: 'gamepad' }] },
   mappings: [
     { description: 'Cyborg #1 - Toggle Terminal Ctrl+`' },
     { description: 'Cyborg #5 - Find Ctrl+F' },
@@ -16,6 +17,7 @@ const FIXTURE = {
 
 const RADIAL_FIXTURE = {
   config: { appName: 'App' },
+  devices: { hardware: [{ id: 1, name: 'gamepad' }] },
   radialMenuCircles: [{ id: 1, sectors: [10, 11, 12, 13] }],
   radialMenuSectors: [
     { id: 10, parentCircleId: 1 },

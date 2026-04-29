@@ -544,6 +544,13 @@ export function generateRewasd(profiles: Profile[]): RewasdFile {
     const circleId = nextCircleId++;
     const sectorIds: number[] = [];
 
+    // Push parent before recursing so it appears before child circles in the array.
+    radialMenuCircles.push({
+      id: circleId,
+      sectors: sectorIds,
+      ...(parentSectorId !== undefined ? { parentSectorId } : {}),
+    });
+
     for (const action of menu.actions) {
       const sectorId = nextSectorId++;
       sectorIds.push(sectorId);
@@ -603,11 +610,6 @@ export function generateRewasd(profiles: Profile[]): RewasdFile {
       radialMenuSectors.push(sector);
     }
 
-    radialMenuCircles.push({
-      id: circleId,
-      sectors: sectorIds,
-      ...(parentSectorId !== undefined ? { parentSectorId } : {}),
-    });
     return circleId;
   }
 

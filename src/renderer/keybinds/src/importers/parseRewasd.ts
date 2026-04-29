@@ -6,81 +6,31 @@ import type {
   RadialAction,
 } from "../data/types";
 import { ParseError } from "./errors";
-
-// ── reWASD file schema types ──────────────────────────────────────────────────
-
-interface RewasdHardware {
-  id: number;
-  name: string;
-  groupId?: number;
-}
-
-interface RewasdMacroItem {
-  keyboard?: { buttonId: number; description: string; action?: string };
-  mouse?: { buttonId: number };
-  command?: { id: number };
-}
-
-interface RewasdMaskSet {
-  deviceId: number;
-  buttonId: number;
-  description?: string;
-}
-
-interface RewasdMask {
-  id: number;
-  set?: RewasdMaskSet[];
-  radialMenuSet?: Array<{ circleId: number; sectorId: number }>;
-}
-
-interface RewasdSector {
-  id: number;
-  parentCircleId: number;
-  childCircleId?: number;
-  description?: string;
-  color?: [number, number, number];
-}
-
-interface RewasdCircle {
-  id: number;
-  parentSectorId?: number;
-  sectors: number[];
-}
-
-interface RewasdShift {
-  id: number;
-  type: string;
-  description?: string;
-}
-
-interface RewasdMapping {
-  description?: string;
-  condition?: {
-    shiftId?: number;
-    mask?: { id: number; activator?: { type?: string } };
-  };
-  jumpToLayer?: { layer: number };
-  macros?: RewasdMacroItem[];
-}
-
-interface RewasdFile {
-  config: { appName: string };
-  mappings: RewasdMapping[];
-  devices?: { hardware: RewasdHardware[] };
-  radialMenuCircles?: RewasdCircle[];
-  radialMenuSectors?: RewasdSector[];
-  shifts?: RewasdShift[];
-  masks?: RewasdMask[];
-}
+import type {
+  RewasdFile,
+  RewasdMapping,
+  RewasdMappingMask,
+  RewasdConditionMask,
+  RewasdMacroItem,
+  RewasdMaskSet,
+  RewasdActivator,
+} from "./rewasdSchema";
 
 function isRewasdFile(json: unknown): json is RewasdFile {
   return (
     typeof json === "object" &&
     json !== null &&
     "config" in json &&
+    "devices" in json &&
     "mappings" in json &&
     Array.isArray((json as RewasdFile).mappings)
   );
+}
+
+function hasMaskCondition(
+  m: RewasdMapping,
+): m is RewasdMappingMask & { condition: RewasdConditionMask } {
+  return !!m.condition && "mask" in m.condition;
 }
 
 // ── Parsing helpers ───────────────────────────────────────────────────────────
@@ -216,7 +166,13 @@ function macrosToBinding(macros: RewasdMacroItem[]): string | undefined {
     if (m.keyboard) {
       key = dikToKey(m.keyboard.description);
     } else if (m.mouse) {
-      key = MOUSE_NAMES[m.mouse.buttonId] ?? `Mouse${m.mouse.buttonId}`;
+      if ("buttonId" in m.mouse) {
+        key = MOUSE_NAMES[m.mouse.buttonId] ?? `Mouse${m.mouse.buttonId}`;
+      } else if ("direction" in m.mouse) {
+        key = `Mouse ${m.mouse.direction.charAt(0).toUpperCase()}${m.mouse.direction.slice(1)}`;
+      } else if ("wheel" in m.mouse) {
+        key = `Wheel ${m.mouse.wheel.charAt(0).toUpperCase()}${m.mouse.wheel.slice(1)}`;
+      }
     }
     if (key && !seen.has(key)) {
       seen.add(key);
@@ -348,13 +304,16 @@ function parseRadialMenus(
   }
 
   const maskToLabel = new Map<number, string>();
+  const maskToBinding = new Map<number, string>();
   for (const m of file.mappings) {
     if (!m.condition?.shiftId || !radialShiftIds.has(m.condition.shiftId))
       continue;
-    if (!m.description || !m.condition.mask) continue;
+    if (!m.description || !hasMaskCondition(m)) continue;
     const maskId = m.condition.mask.id;
     if (!virtualMasks.some((vm) => vm.id === maskId)) continue;
     maskToLabel.set(maskId, m.description);
+    const binding = macrosToBinding(m.macros ?? []);
+    if (binding) maskToBinding.set(maskId, binding);
   }
 
   const sectorById = new Map(sectors.map((s) => [s.id, s]));
@@ -396,7 +355,8 @@ function parseRadialMenus(
       if (maskId === undefined) return;
       const label = maskToLabel.get(maskId);
       if (!label) return;
-      actions.push({ label, direction });
+      const binding = maskToBinding.get(maskId);
+      actions.push({ label, direction, ...(binding ? { binding } : {}) });
     });
 
     return actions;
@@ -425,7 +385,9 @@ function parseRadialMenus(
           trigger.description.replace(/\s*Trigger\s*$/i, "").trim() ||
           trigger.description;
       }
-      const maskId = trigger.condition?.mask?.id;
+      const maskId = hasMaskCondition(trigger)
+        ? trigger.condition.mask.id
+        : undefined;
       if (maskId !== undefined) {
         const entry = physicalMasks.get(maskId);
         if (entry) {
@@ -454,7 +416,27 @@ function parseRadialMenus(
 
 // ── Main parser ───────────────────────────────────────────────────────────────
 
-type ActivatorType = "single" | "long" | "double";
+type ActivatorType =
+  | "single"
+  | "double"
+  | "triple"
+  | "long"
+  | "down"
+  | "up"
+  | "turbo"
+  | "toggle";
+
+function resolveActivatorType(a: RewasdActivator | undefined): ActivatorType {
+  if (!a) return "single";
+  if (a.type === "start") return "down";
+  if (a.type === "release") return "up";
+  if (a.type === "triple") return "triple";
+  if (a.mode === "turbo") return "turbo";
+  if (a.mode === "toggle") return "toggle";
+  if (a.type === "long") return "long";
+  if (a.type === "double") return "double";
+  return "single";
+}
 
 function shiftLayerDisplayName(key: string): string {
   if (key === "shift") return "Shift";
@@ -536,13 +518,10 @@ export function parseRewasd(json: unknown): Profile[] {
       shiftId !== undefined
         ? (shiftIdToLayerKey.get(shiftId) ?? "shift")
         : "default";
-    const activatorRaw = mapping.condition?.mask?.activator?.type ?? "single";
-    const activator: ActivatorType =
-      activatorRaw === "long"
-        ? "long"
-        : activatorRaw === "double"
-          ? "double"
-          : "single";
+    const rawActivator = hasMaskCondition(mapping)
+      ? mapping.condition.mask.activator
+      : undefined;
+    const activator: ActivatorType = resolveActivatorType(rawActivator);
 
     // ── Description-based (VSCode-style "Cyborg #N - Label KeyCombo") ──
     if (mapping.description) {
@@ -568,7 +547,7 @@ export function parseRewasd(json: unknown): Profile[] {
     }
 
     // ── Mask-based fallback (WoW-style unlabeled / short-description) ──
-    if (!mapping.condition?.mask) continue;
+    if (!hasMaskCondition(mapping)) continue;
 
     const maskId = mapping.condition.mask.id;
     const maskEntry = physicalMasks.get(maskId);

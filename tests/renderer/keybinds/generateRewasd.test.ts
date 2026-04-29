@@ -484,7 +484,11 @@ describe("generateRewasd — radial menus", () => {
     expect(file.radialMenuCircles).toHaveLength(2);
     const subSector = file.radialMenuSectors?.find((s) => s.description === "Sub");
     expect(subSector?.childCircleId).toBeDefined();
-    expect(file.radialMenuCircles?.[0].id).toBeDefined();
+    // Parent circle must appear before child circle.
+    const circles = file.radialMenuCircles!;
+    const parentIdx = circles.findIndex((c) => !c.parentSectorId);
+    const childIdx = circles.findIndex((c) => c.parentSectorId !== undefined);
+    expect(parentIdx).toBeLessThan(childIdx);
   });
 });
 
@@ -592,6 +596,45 @@ describe("round-trip: generateRewasd → parseRewasd", () => {
     expect(b?.up).toBe("F");
     expect(b?.turbo).toBe("G");
     expect(b?.toggle).toBe("H");
+  });
+
+  it("radial menu action bindings survive round-trip", () => {
+    const profile: Profile = {
+      id: "rt-radial",
+      label: "RTRadial",
+      platform: "windows",
+      type: "rewasd",
+      device: "cyborg",
+      layers: {
+        default: {
+          "1":  { zone: "unzoned", label: "Anchor", bindings: { single: "Z" } },
+          "28": { zone: "unzoned", label: "RadialTrigger", bindings: {} },
+        },
+      },
+      radialMenus: [
+        {
+          id: "menu-rt",
+          label: "My Menu",
+          trigger: "28",
+          color: "#ff1e1e",
+          actions: [
+            { label: "Up",    direction: "↑", binding: "A" },
+            { label: "Down",  direction: "↓", binding: "B" },
+            { label: "Left",  direction: "←", binding: "C" },
+            { label: "Right", direction: "→", binding: "D" },
+          ],
+        },
+      ],
+    };
+    const reparsed = parseRewasd(generateRewasd([profile]));
+    const menus = reparsed[0].radialMenus;
+    expect(menus).toHaveLength(1);
+    const actions = menus![0].actions;
+    expect(actions).toHaveLength(4);
+    expect(actions[0].binding).toBe("A");
+    expect(actions[1].binding).toBe("B");
+    expect(actions[2].binding).toBe("C");
+    expect(actions[3].binding).toBe("D");
   });
 
   it("cyborg+cyro pair survives round-trip", () => {

@@ -117,4 +117,30 @@ describe("Btn", () => {
     await userEvent.click(document.querySelector(".btn")!);
     expect(onEditButton).not.toHaveBeenCalled();
   });
+
+  it("dims when highlightedButtons is set and id is not in the set", () => {
+    const { container } = render(
+      <Btn
+        id="3"
+        button={{ zone: "edit", label: "Copy", bindings: {} }}
+        activeZone={null}
+        highlightedButtons={new Set(["99"])}
+      />,
+    );
+    const btn = container.querySelector(".btn") as HTMLElement;
+    expect(btn.style.opacity).toBe("0.1");
+  });
+
+  it("does not dim when highlightedButtons is set and id is in the set", () => {
+    const { container } = render(
+      <Btn
+        id="3"
+        button={{ zone: "edit", label: "Copy", bindings: {} }}
+        activeZone={null}
+        highlightedButtons={new Set(["3"])}
+      />,
+    );
+    const btn = container.querySelector(".btn") as HTMLElement;
+    expect(btn.style.opacity).toBe("");
+  });
 });

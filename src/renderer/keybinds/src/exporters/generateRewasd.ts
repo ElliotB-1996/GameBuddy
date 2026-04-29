@@ -5,14 +5,12 @@ import type {
   RewasdShift,
   RewasdMask,
   RewasdMapping,
-  RewasdMappingMask,
+  RewasdConditionMask,
   RewasdMacroItem,
   RewasdActivator,
   RewasdCircle,
   RewasdSector,
 } from "../importers/rewasdSchema";
-
-// ── Types ─────────────────────────────────────────────────────────────────────
 
 export const BINDING_ACTIVATORS = [
   "single",
@@ -25,8 +23,6 @@ export const BINDING_ACTIVATORS = [
   "toggle",
 ] as const;
 type ActivatorType = (typeof BINDING_ACTIVATORS)[number];
-
-// ── DIK scan codes (DirectInput button IDs for keyboard macros) ───────────────
 
 export const DIK_SCAN: Record<string, number> = {
   DIK_ESCAPE: 1,
@@ -134,8 +130,6 @@ export const DIK_SCAN: Record<string, number> = {
   DIK_APPS: 221,
 };
 
-// ── Display name → DIK name (inverse of DIK_NAMES in the parser) ─────────────
-
 export const DISPLAY_TO_DIK: Record<string, string> = {
   "0": "DIK_0",
   "1": "DIK_1",
@@ -238,9 +232,7 @@ export const DISPLAY_TO_DIK: Record<string, string> = {
   Menu: "DIK_APPS",
 };
 
-// ── Reverse button maps (inverse of CYBORG_BTN / CYRO_BTN in the parser) ─────
 // Azeron button number (string) → reWASD buttonId (number)
-
 export const CYBORG_BTN_INV: Record<string, number> = {
   "1": 1,
   "2": 5,
@@ -299,8 +291,6 @@ export const CYRO_BTN_INV: Record<string, number> = {
   "31": 36,
 };
 
-// ── Mouse helpers ─────────────────────────────────────────────────────────────
-
 const MOUSE_BTN: Record<string, number> = {
   LClick: 1,
   RClick: 2,
@@ -322,8 +312,6 @@ const WHEEL_DIR: Record<string, string> = {
   "Wheel Left": "left",
   "Wheel Right": "right",
 };
-
-// ── bindingToMacros ───────────────────────────────────────────────────────────
 
 export function bindingToMacros(binding: string): RewasdMacroItem[] {
   if (!binding || binding.startsWith("→ ")) return [];
@@ -367,8 +355,6 @@ export function bindingToMacros(binding: string): RewasdMacroItem[] {
   return macros;
 }
 
-// ── activatorToRewasd ─────────────────────────────────────────────────────────
-
 export function activatorToRewasd(type: ActivatorType): RewasdActivator {
   switch (type) {
     case "single":
@@ -390,21 +376,19 @@ export function activatorToRewasd(type: ActivatorType): RewasdActivator {
   }
 }
 
-// ── generateRewasd ────────────────────────────────────────────────────────────
-
 export function generateRewasd(profiles: Profile[]): RewasdFile {
+  if (profiles.length === 0)
+    throw new Error("generateRewasd requires at least one profile");
   const cyborg = profiles.find((p) => p.device === "cyborg");
   const cyro = profiles.find((p) => p.device === "cyro");
   const first = cyborg ?? cyro!;
 
-  // ── devices.hardware ──────────────────────────────────────────────────────
   const hardware: RewasdHardware[] = [];
   if (cyborg) hardware.push({ id: 1, name: "gamepad" });
   if (cyro) hardware.push({ id: 2, name: "gamepad" });
   hardware.push({ id: 21, name: "keyboard", type: "standard" });
   hardware.push({ id: 33, name: "mouse" });
 
-  // ── Collect named layer keys across all profiles ──────────────────────────
   const allLayerKeys = new Set<string>();
   for (const p of profiles) {
     for (const key of Object.keys(p.layers)) {
@@ -412,7 +396,6 @@ export function generateRewasd(profiles: Profile[]): RewasdFile {
     }
   }
 
-  // ── Shifts (non-radial) ───────────────────────────────────────────────────
   let nextShiftId = 1;
   const layerKeyToShiftId = new Map<string, number>();
   const shifts: RewasdShift[] = [];
@@ -426,7 +409,6 @@ export function generateRewasd(profiles: Profile[]): RewasdFile {
     shifts.push(shift);
   }
 
-  // ── Radial menu shifts ────────────────────────────────────────────────────
   const radialMenus = (cyborg ?? cyro)?.radialMenus ?? [];
   const radialMenuShiftIds: number[] = [];
   for (let i = 0; i < radialMenus.length; i++) {
@@ -435,7 +417,6 @@ export function generateRewasd(profiles: Profile[]): RewasdFile {
     shifts.push({ id, type: "radialMenu" });
   }
 
-  // ── Masks + mappings (mutable state shared by helpers below) ─────────────
   let nextMaskId = 1;
   const masks: RewasdMask[] = [];
   const mappings: RewasdMapping[] = [];
@@ -477,8 +458,6 @@ export function generateRewasd(profiles: Profile[]): RewasdFile {
     getOrCreateButtonMask(radialDeviceId, menu.trigger, radialBtnInv);
   }
 
-  // ── Layer-switch resolution ───────────────────────────────────────────────
-
   function layerDisplayName(key: string): string {
     if (key === "shift") return "Shift";
     const m = /^shift-(\d+)$/.exec(key);
@@ -498,8 +477,6 @@ export function generateRewasd(profiles: Profile[]): RewasdFile {
     return undefined;
   }
 
-  // ── Button mappings ───────────────────────────────────────────────────────
-
   for (const p of profiles) {
     const deviceId = p.device === "cyborg" ? 1 : 2;
     const btnInv = p.device === "cyborg" ? CYBORG_BTN_INV : CYRO_BTN_INV;
@@ -517,7 +494,7 @@ export function generateRewasd(profiles: Profile[]): RewasdFile {
           const binding = button.bindings[activatorType];
           if (!binding) continue;
 
-          const condition = {
+          const condition: RewasdConditionMask = {
             ...(shiftId !== undefined ? { shiftId } : {}),
             mask: { id: maskId, activator: activatorToRewasd(activatorType) },
           };
@@ -529,7 +506,7 @@ export function generateRewasd(profiles: Profile[]): RewasdFile {
                 description: button.label,
                 condition,
                 jumpToLayer: { layer: targetLayer },
-              } as RewasdMappingMask);
+              });
             }
           } else {
             const macros = bindingToMacros(binding);
@@ -538,15 +515,13 @@ export function generateRewasd(profiles: Profile[]): RewasdFile {
                 description: button.label,
                 condition,
                 macros,
-              } as RewasdMappingMask);
+              });
             }
           }
         }
       }
     }
   }
-
-  // ── Radial menus ──────────────────────────────────────────────────────────
 
   const radialMenuCircles: RewasdCircle[] = [];
   const radialMenuSectors: RewasdSector[] = [];
@@ -593,13 +568,13 @@ export function generateRewasd(profiles: Profile[]): RewasdFile {
           radialMenuSet: [{ circleId, sectorId }],
         });
 
-        const sectorCondition = {
+        const sectorCondition: RewasdConditionMask = {
           shiftId: radialShiftId,
           mask: {
             id: sectorMaskId,
             activator: {
-              type: "single" as const,
-              mode: "hold_until_release" as const,
+              type: "single",
+              mode: "hold_until_release",
             },
           },
         };
@@ -611,7 +586,7 @@ export function generateRewasd(profiles: Profile[]): RewasdFile {
               description: action.label,
               condition: sectorCondition,
               jumpToLayer: { layer: targetLayer },
-            } as RewasdMappingMask);
+            });
           }
         } else {
           const macros = bindingToMacros(action.binding);
@@ -620,7 +595,7 @@ export function generateRewasd(profiles: Profile[]): RewasdFile {
               description: action.label,
               condition: sectorCondition,
               macros,
-            } as RewasdMappingMask);
+            });
           }
         }
       }
@@ -653,11 +628,9 @@ export function generateRewasd(profiles: Profile[]): RewasdFile {
           },
         },
         jumpToLayer: { layer: radialShiftId },
-      } as RewasdMappingMask);
+      });
     }
   });
-
-  // ── Assemble ──────────────────────────────────────────────────────────────
 
   return {
     schemaVersion: 3,

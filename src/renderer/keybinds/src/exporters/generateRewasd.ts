@@ -1,4 +1,4 @@
-import type { Profile, RadialMenu } from "../data/types";
+import type { Profile } from "../data/types";
 import type {
   RewasdFile,
   RewasdMacroItem,
@@ -7,15 +7,17 @@ import type {
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-type ActivatorType =
-  | "single"
-  | "double"
-  | "triple"
-  | "long"
-  | "down"
-  | "up"
-  | "turbo"
-  | "toggle";
+export const BINDING_ACTIVATORS = [
+  "single",
+  "double",
+  "triple",
+  "long",
+  "down",
+  "up",
+  "turbo",
+  "toggle",
+] as const;
+type ActivatorType = (typeof BINDING_ACTIVATORS)[number];
 
 // ── DIK scan codes (DirectInput button IDs for keyboard macros) ───────────────
 
@@ -383,11 +385,6 @@ export function activatorToRewasd(type: ActivatorType): RewasdActivator {
 
 // ── generateRewasd placeholder (added in Task 2) ──────────────────────────────
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function generateRewasd(_profiles: Profile[]): RewasdFile {
   throw new Error("Not implemented");
 }
-
-// RadialMenu is used by the buildCircle function added in Task 2.
-// Kept here to avoid re-adding the import later.
-export type { RadialMenu };

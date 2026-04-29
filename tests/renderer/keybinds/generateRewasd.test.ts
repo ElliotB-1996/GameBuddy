@@ -272,3 +272,102 @@ describe("generateRewasd — cyborg+cyro pair", () => {
     expect(file.mappings.find((m) => m.description === "Beta")).toBeDefined();
   });
 });
+
+describe("generateRewasd — shift layers", () => {
+  const withShift: Profile = {
+    id: "shift-cyborg",
+    label: "ShiftApp",
+    platform: "windows",
+    type: "rewasd",
+    device: "cyborg",
+    layerLabels: { shift: "Fn" },
+    layers: {
+      default: {
+        "1": { zone: "unzoned", label: "Alpha", bindings: { single: "A" } },
+        "2": { zone: "unzoned", label: "SwitchToFn", bindings: { single: "→ Fn" } },
+      },
+      shift: {
+        "1": { zone: "unzoned", label: "Beta",  bindings: { single: "B" } },
+        "2": { zone: "unzoned", label: "ReturnToDefault", bindings: { single: "→ Default" } },
+      },
+    },
+  };
+
+  it("emits a shift entry for the named layer", () => {
+    const file = generateRewasd([withShift]);
+    expect(file.shifts).toHaveLength(1);
+    expect(file.shifts?.[0].type).toBe("default");
+    expect(file.shifts?.[0].description).toBe("Fn");
+  });
+
+  it("shift-layer mappings carry the shiftId on their condition", () => {
+    const file = generateRewasd([withShift]);
+    const shiftId = file.shifts?.[0].id!;
+    const betaMapping = file.mappings.find((m) => m.description === "Beta");
+    expect((betaMapping as any).condition.shiftId).toBe(shiftId);
+  });
+
+  it("default-layer mappings have no shiftId", () => {
+    const file = generateRewasd([withShift]);
+    const alphaMapping = file.mappings.find((m) => m.description === "Alpha");
+    expect((alphaMapping as any).condition.shiftId).toBeUndefined();
+  });
+
+  it("layer-switch binding emits jumpToLayer with shift id", () => {
+    const file = generateRewasd([withShift]);
+    const shiftId = file.shifts?.[0].id!;
+    const switchMapping = file.mappings.find((m) => m.description === "SwitchToFn");
+    expect(switchMapping?.jumpToLayer?.layer).toBe(shiftId);
+    expect(switchMapping?.macros).toBeUndefined();
+  });
+
+  it("→ Default binding emits jumpToLayer layer:0", () => {
+    const file = generateRewasd([withShift]);
+    const returnMapping = file.mappings.find((m) => m.description === "ReturnToDefault");
+    expect(returnMapping?.jumpToLayer?.layer).toBe(0);
+  });
+});
+
+describe("generateRewasd — all activator types", () => {
+  const allActivators: Profile = {
+    id: "act-test",
+    label: "ActivatorTest",
+    platform: "windows",
+    type: "rewasd",
+    device: "cyborg",
+    layers: {
+      default: {
+        "1": {
+          zone: "unzoned",
+          label: "Btn1",
+          bindings: {
+            single: "A", double: "B", triple: "C",
+            long: "D", down: "E", up: "F", turbo: "G", toggle: "H",
+          },
+        },
+      },
+    },
+  };
+
+  it("emits one mapping per non-empty activator", () => {
+    const file = generateRewasd([allActivators]);
+    const btn1Mappings = file.mappings.filter((m) => m.description === "Btn1");
+    expect(btn1Mappings).toHaveLength(8);
+  });
+
+  it("double activator produces type:double on the condition", () => {
+    const file = generateRewasd([allActivators]);
+    const m = file.mappings.find(
+      (m) => m.description === "Btn1" && (m as any).condition.mask.activator.type === "double",
+    );
+    expect(m).toBeDefined();
+  });
+
+  it("turbo activator produces mode:turbo on the condition", () => {
+    const file = generateRewasd([allActivators]);
+    const m = file.mappings.find(
+      (m) => m.description === "Btn1" && (m as any).condition.mask.activator.mode === "turbo",
+    );
+    expect(m).toBeDefined();
+  });
+});

@@ -147,3 +147,128 @@ describe("activatorToRewasd", () => {
     expect(activatorToRewasd("toggle")).toEqual({ type: "single", mode: "toggle" });
   });
 });
+
+const cyborgOnly: Profile = {
+  id: "test-cyborg",
+  label: "My App",
+  platform: "windows",
+  type: "rewasd",
+  device: "cyborg",
+  layers: {
+    default: {
+      "1": { zone: "unzoned", label: "Alpha",  bindings: { single: "A" } },
+      "2": { zone: "unzoned", label: "Combo",  bindings: { single: "Ctrl+Z" } },
+      "5": { zone: "unzoned", label: "Click",  bindings: { single: "LClick" } },
+      "9": { zone: "unzoned", label: "Unmap",  bindings: {} },
+    },
+  },
+};
+
+describe("generateRewasd — structure", () => {
+  it("sets config.appName from profile label", () => {
+    expect(generateRewasd([cyborgOnly]).config.appName).toBe("My App");
+  });
+
+  it("emits cyborg gamepad as device id 1", () => {
+    const file = generateRewasd([cyborgOnly]);
+    const gp = file.devices.hardware.find((h) => h.name === "gamepad");
+    expect(gp?.id).toBe(1);
+  });
+
+  it("always emits keyboard (id 21) and mouse (id 33) output devices", () => {
+    const file = generateRewasd([cyborgOnly]);
+    expect(file.devices.hardware.some((h) => h.id === 21 && h.name === "keyboard")).toBe(true);
+    expect(file.devices.hardware.some((h) => h.id === 33 && h.name === "mouse")).toBe(true);
+  });
+
+  it("does not emit device id 2 when there is no cyro", () => {
+    const file = generateRewasd([cyborgOnly]);
+    expect(file.devices.hardware.some((h) => h.id === 2)).toBe(false);
+  });
+
+  it("creates one mask per mapped button (Azeron btn 1 → reWASD btn 1)", () => {
+    const file = generateRewasd([cyborgOnly]);
+    const btn1Mask = file.masks?.find((m) => m.set?.[0]?.buttonId === 1);
+    expect(btn1Mask).toBeDefined();
+    expect(btn1Mask?.set?.[0].deviceId).toBe(1);
+  });
+
+  it("skips shifts when there are no named layers", () => {
+    expect(generateRewasd([cyborgOnly]).shifts).toBeUndefined();
+  });
+
+  it("emits a mapping with the button label as description", () => {
+    const file = generateRewasd([cyborgOnly]);
+    const m = file.mappings.find((m) => m.description === "Alpha");
+    expect(m).toBeDefined();
+  });
+
+  it("emits DIK_A macro for binding A", () => {
+    const file = generateRewasd([cyborgOnly]);
+    const m = file.mappings.find((m) => m.description === "Alpha");
+    expect(m?.macros?.[0].keyboard?.description).toBe("DIK_A");
+  });
+
+  it("emits two keyboard macros for Ctrl+Z", () => {
+    const file = generateRewasd([cyborgOnly]);
+    const m = file.mappings.find((m) => m.description === "Combo");
+    expect(m?.macros).toHaveLength(2);
+    expect(m?.macros?.[0].keyboard?.description).toBe("DIK_LCONTROL");
+    expect(m?.macros?.[1].keyboard?.description).toBe("DIK_Z");
+  });
+
+  it("emits mouse button macro for LClick", () => {
+    const file = generateRewasd([cyborgOnly]);
+    const m = file.mappings.find((m) => m.description === "Click");
+    expect(m?.macros?.[0].mouse).toEqual({ buttonId: 1 });
+  });
+
+  it("skips buttons with no bindings", () => {
+    const file = generateRewasd([cyborgOnly]);
+    expect(file.mappings.find((m) => m.description === "Unmap")).toBeUndefined();
+  });
+
+  it("emits single activator on the condition", () => {
+    const file = generateRewasd([cyborgOnly]);
+    const m = file.mappings.find((m) => m.description === "Alpha");
+    expect((m as any).condition.mask.activator).toEqual({
+      type: "single",
+      mode: "hold_until_release",
+    });
+  });
+});
+
+describe("generateRewasd — cyborg+cyro pair", () => {
+  const cyroOnly: Profile = {
+    id: "test-cyro",
+    label: "My App",
+    platform: "windows",
+    type: "rewasd",
+    device: "cyro",
+    layers: {
+      default: {
+        "1": { zone: "unzoned", label: "Beta", bindings: { single: "B" } },
+      },
+    },
+  };
+
+  it("emits device id 1 for cyborg, id 2 for cyro", () => {
+    const file = generateRewasd([cyborgOnly, cyroOnly]);
+    expect(file.devices.hardware.some((h) => h.id === 1 && h.name === "gamepad")).toBe(true);
+    expect(file.devices.hardware.some((h) => h.id === 2 && h.name === "gamepad")).toBe(true);
+  });
+
+  it("cyro mask has deviceId 2", () => {
+    const file = generateRewasd([cyborgOnly, cyroOnly]);
+    const cyroMask = file.masks?.find(
+      (m) => m.set?.[0].deviceId === 2 && m.set?.[0].buttonId === 20,
+    );
+    expect(cyroMask).toBeDefined();
+  });
+
+  it("emits mappings for both devices", () => {
+    const file = generateRewasd([cyborgOnly, cyroOnly]);
+    expect(file.mappings.find((m) => m.description === "Alpha")).toBeDefined();
+    expect(file.mappings.find((m) => m.description === "Beta")).toBeDefined();
+  });
+});

@@ -1,8 +1,15 @@
-import type { Profile } from "../data/types";
+import type { Profile, RadialMenu } from "../data/types";
 import type {
   RewasdFile,
+  RewasdHardware,
+  RewasdShift,
+  RewasdMask,
+  RewasdMapping,
+  RewasdMappingMask,
   RewasdMacroItem,
   RewasdActivator,
+  RewasdCircle,
+  RewasdSector,
 } from "../importers/rewasdSchema";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -383,8 +390,284 @@ export function activatorToRewasd(type: ActivatorType): RewasdActivator {
   }
 }
 
-// ── generateRewasd placeholder (added in Task 2) ──────────────────────────────
+// ── generateRewasd ────────────────────────────────────────────────────────────
 
-export function generateRewasd(_profiles: Profile[]): RewasdFile {
-  throw new Error("Not implemented");
+export function generateRewasd(profiles: Profile[]): RewasdFile {
+  const cyborg = profiles.find((p) => p.device === "cyborg");
+  const cyro = profiles.find((p) => p.device === "cyro");
+  const first = cyborg ?? cyro!;
+
+  // ── devices.hardware ──────────────────────────────────────────────────────
+  const hardware: RewasdHardware[] = [];
+  if (cyborg) hardware.push({ id: 1, name: "gamepad" });
+  if (cyro) hardware.push({ id: 2, name: "gamepad" });
+  hardware.push({ id: 21, name: "keyboard", type: "standard" });
+  hardware.push({ id: 33, name: "mouse" });
+
+  // ── Collect named layer keys across all profiles ──────────────────────────
+  const allLayerKeys = new Set<string>();
+  for (const p of profiles) {
+    for (const key of Object.keys(p.layers)) {
+      if (key !== "default") allLayerKeys.add(key);
+    }
+  }
+
+  // ── Shifts (non-radial) ───────────────────────────────────────────────────
+  let nextShiftId = 1;
+  const layerKeyToShiftId = new Map<string, number>();
+  const shifts: RewasdShift[] = [];
+  const layerLabels = first.layerLabels ?? {};
+
+  for (const key of allLayerKeys) {
+    const id = nextShiftId++;
+    layerKeyToShiftId.set(key, id);
+    const shift: RewasdShift = { id, type: "default" };
+    if (layerLabels[key]) shift.description = layerLabels[key];
+    shifts.push(shift);
+  }
+
+  // ── Radial menu shifts ────────────────────────────────────────────────────
+  const radialMenus = (cyborg ?? cyro)?.radialMenus ?? [];
+  const radialMenuShiftIds: number[] = [];
+  for (let i = 0; i < radialMenus.length; i++) {
+    const id = nextShiftId++;
+    radialMenuShiftIds.push(id);
+    shifts.push({ id, type: "radialMenu" });
+  }
+
+  // ── Masks + mappings (mutable state shared by helpers below) ─────────────
+  let nextMaskId = 1;
+  const masks: RewasdMask[] = [];
+  const mappings: RewasdMapping[] = [];
+  const buttonMaskMap = new Map<string, number>();
+
+  function getOrCreateButtonMask(
+    deviceId: number,
+    azeronBtnId: string,
+    btnInv: Record<string, number>,
+  ): number | undefined {
+    const rewasdBtnId = btnInv[azeronBtnId];
+    if (rewasdBtnId === undefined) return undefined;
+    const key = `${deviceId}-${azeronBtnId}`;
+    if (buttonMaskMap.has(key)) return buttonMaskMap.get(key)!;
+    const maskId = nextMaskId++;
+    buttonMaskMap.set(key, maskId);
+    masks.push({ id: maskId, set: [{ deviceId, buttonId: rewasdBtnId }] });
+    return maskId;
+  }
+
+  // Pre-allocate button masks for every button in every layer.
+  for (const p of profiles) {
+    const deviceId = p.device === "cyborg" ? 1 : 2;
+    const btnInv = p.device === "cyborg" ? CYBORG_BTN_INV : CYRO_BTN_INV;
+    for (const layer of Object.values(p.layers)) {
+      if (!layer) continue;
+      for (const azeronBtnId of Object.keys(layer)) {
+        getOrCreateButtonMask(deviceId, azeronBtnId, btnInv);
+      }
+    }
+  }
+
+  // Pre-allocate trigger button masks for radial menus.
+  const radialOwner = cyborg ?? cyro!;
+  const radialDeviceId = radialOwner.device === "cyborg" ? 1 : 2;
+  const radialBtnInv =
+    radialOwner.device === "cyborg" ? CYBORG_BTN_INV : CYRO_BTN_INV;
+  for (const menu of radialMenus) {
+    getOrCreateButtonMask(radialDeviceId, menu.trigger, radialBtnInv);
+  }
+
+  // ── Layer-switch resolution ───────────────────────────────────────────────
+
+  function layerDisplayName(key: string): string {
+    if (key === "shift") return "Shift";
+    const m = /^shift-(\d+)$/.exec(key);
+    return m ? `Shift ${m[1]}` : key;
+  }
+
+  function resolveLayerTarget(binding: string): number | undefined {
+    if (!binding.startsWith("→ ")) return undefined;
+    const target = binding.slice(2).trim();
+    if (target === "Default") return 0;
+    for (const [key, label] of Object.entries(layerLabels)) {
+      if (label === target) return layerKeyToShiftId.get(key);
+    }
+    for (const [key, shiftId] of layerKeyToShiftId.entries()) {
+      if (layerDisplayName(key) === target) return shiftId;
+    }
+    return undefined;
+  }
+
+  // ── Button mappings ───────────────────────────────────────────────────────
+
+  for (const p of profiles) {
+    const deviceId = p.device === "cyborg" ? 1 : 2;
+    const btnInv = p.device === "cyborg" ? CYBORG_BTN_INV : CYRO_BTN_INV;
+
+    for (const [layerKey, layer] of Object.entries(p.layers)) {
+      if (!layer) continue;
+      const shiftId =
+        layerKey !== "default" ? layerKeyToShiftId.get(layerKey) : undefined;
+
+      for (const [azeronBtnId, button] of Object.entries(layer)) {
+        const maskId = getOrCreateButtonMask(deviceId, azeronBtnId, btnInv);
+        if (maskId === undefined) continue;
+
+        for (const activatorType of BINDING_ACTIVATORS) {
+          const binding = button.bindings[activatorType];
+          if (!binding) continue;
+
+          const condition = {
+            ...(shiftId !== undefined ? { shiftId } : {}),
+            mask: { id: maskId, activator: activatorToRewasd(activatorType) },
+          };
+
+          if (binding.startsWith("→ ")) {
+            const targetLayer = resolveLayerTarget(binding);
+            if (targetLayer !== undefined) {
+              mappings.push({
+                description: button.label,
+                condition,
+                jumpToLayer: { layer: targetLayer },
+              } as RewasdMappingMask);
+            }
+          } else {
+            const macros = bindingToMacros(binding);
+            if (macros.length > 0) {
+              mappings.push({
+                description: button.label,
+                condition,
+                macros,
+              } as RewasdMappingMask);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // ── Radial menus ──────────────────────────────────────────────────────────
+
+  const radialMenuCircles: RewasdCircle[] = [];
+  const radialMenuSectors: RewasdSector[] = [];
+  let nextCircleId = 1;
+  let nextSectorId = 1;
+
+  function hexToRgb(hex: string): [number, number, number] {
+    return [
+      parseInt(hex.slice(1, 3), 16),
+      parseInt(hex.slice(3, 5), 16),
+      parseInt(hex.slice(5, 7), 16),
+    ];
+  }
+
+  function buildCircle(
+    menu: RadialMenu,
+    parentSectorId: number | undefined,
+    radialShiftId: number,
+  ): number {
+    const circleId = nextCircleId++;
+    const sectorIds: number[] = [];
+
+    for (const action of menu.actions) {
+      const sectorId = nextSectorId++;
+      sectorIds.push(sectorId);
+
+      const sector: RewasdSector = {
+        id: sectorId,
+        parentCircleId: circleId,
+        description: action.label,
+        color: hexToRgb(menu.color),
+      };
+
+      if (action.submenu) {
+        sector.childCircleId = buildCircle(
+          action.submenu,
+          sectorId,
+          radialShiftId,
+        );
+      } else if (action.binding) {
+        const sectorMaskId = nextMaskId++;
+        masks.push({
+          id: sectorMaskId,
+          radialMenuSet: [{ circleId, sectorId }],
+        });
+
+        const sectorCondition = {
+          shiftId: radialShiftId,
+          mask: {
+            id: sectorMaskId,
+            activator: {
+              type: "single" as const,
+              mode: "hold_until_release" as const,
+            },
+          },
+        };
+
+        if (action.binding.startsWith("→ ")) {
+          const targetLayer = resolveLayerTarget(action.binding);
+          if (targetLayer !== undefined) {
+            mappings.push({
+              description: action.label,
+              condition: sectorCondition,
+              jumpToLayer: { layer: targetLayer },
+            } as RewasdMappingMask);
+          }
+        } else {
+          const macros = bindingToMacros(action.binding);
+          if (macros.length > 0) {
+            mappings.push({
+              description: action.label,
+              condition: sectorCondition,
+              macros,
+            } as RewasdMappingMask);
+          }
+        }
+      }
+
+      radialMenuSectors.push(sector);
+    }
+
+    radialMenuCircles.push({
+      id: circleId,
+      sectors: sectorIds,
+      ...(parentSectorId !== undefined ? { parentSectorId } : {}),
+    });
+    return circleId;
+  }
+
+  radialMenus.forEach((menu, i) => {
+    const radialShiftId = radialMenuShiftIds[i];
+    buildCircle(menu, undefined, radialShiftId);
+
+    const triggerMaskId = buttonMaskMap.get(
+      `${radialDeviceId}-${menu.trigger}`,
+    );
+    if (triggerMaskId !== undefined) {
+      mappings.push({
+        description: menu.label,
+        condition: {
+          mask: {
+            id: triggerMaskId,
+            activator: { type: "single", mode: "hold_until_release" },
+          },
+        },
+        jumpToLayer: { layer: radialShiftId },
+      } as RewasdMappingMask);
+    }
+  });
+
+  // ── Assemble ──────────────────────────────────────────────────────────────
+
+  return {
+    schemaVersion: 3,
+    appVersion: "9.3.3",
+    config: { appName: first.label },
+    devices: { hardware },
+    ...(shifts.length > 0 ? { shifts } : {}),
+    ...(masks.length > 0 ? { masks } : {}),
+    ...(radialMenuCircles.length > 0 ? { radialMenuCircles } : {}),
+    ...(radialMenuSectors.length > 0 ? { radialMenuSectors } : {}),
+    mappings,
+  };
 }

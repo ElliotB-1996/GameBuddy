@@ -292,6 +292,19 @@ function parseRadialMenus(
   );
   if (radialShiftIds.size === 0) return [];
 
+  // Build shiftId → display label for non-radial shifts (used for "→ Name" bindings).
+  const shiftIdToLabel = new Map<number, string>();
+  let shiftCount = 0;
+  for (const shift of shifts) {
+    if (radialShiftIds.has(shift.id)) continue;
+    shiftCount++;
+    const key = shiftCount === 1 ? "shift" : `shift-${shiftCount}`;
+    shiftIdToLabel.set(
+      shift.id,
+      shift.description ?? (key === "shift" ? "Shift" : `Shift ${shiftCount}`),
+    );
+  }
+
   const virtualMasks = masks.filter(
     (m) => m.radialMenuSet && m.radialMenuSet.length > 0,
   );
@@ -313,7 +326,16 @@ function parseRadialMenus(
     if (!virtualMasks.some((vm) => vm.id === maskId)) continue;
     maskToLabel.set(maskId, m.description);
     const binding = macrosToBinding(m.macros ?? []);
-    if (binding) maskToBinding.set(maskId, binding);
+    if (binding) {
+      maskToBinding.set(maskId, binding);
+    } else if (m.jumpToLayer) {
+      const targetLayer = m.jumpToLayer.layer;
+      const label =
+        targetLayer === 0
+          ? "Default"
+          : (shiftIdToLabel.get(targetLayer) ?? "Default");
+      maskToBinding.set(maskId, `→ ${label}`);
+    }
   }
 
   const sectorById = new Map(sectors.map((s) => [s.id, s]));

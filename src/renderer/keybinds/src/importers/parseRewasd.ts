@@ -10,7 +10,9 @@ import type {
   RewasdFile,
   RewasdMapping,
   RewasdMappingMask,
+  RewasdMappingHardware,
   RewasdConditionMask,
+  RewasdConditionHardware,
   RewasdMacroItem,
   RewasdMaskSet,
   RewasdActivator,
@@ -31,6 +33,12 @@ function hasMaskCondition(
   m: RewasdMapping,
 ): m is RewasdMappingMask & { condition: RewasdConditionMask } {
   return !!m.condition && "mask" in m.condition;
+}
+
+function hasHardwareCondition(
+  m: RewasdMapping,
+): m is RewasdMappingHardware & { condition: RewasdConditionHardware } {
+  return !!m.condition && "hardware" in m.condition;
 }
 
 // ── Parsing helpers ───────────────────────────────────────────────────────────
@@ -568,16 +576,26 @@ export function parseRewasd(json: unknown): Profile[] {
       }
     }
 
-    // ── Mask-based fallback (WoW-style unlabeled / short-description) ──
-    if (!hasMaskCondition(mapping)) continue;
+    // ── Mask-based or direct-hardware fallback ──
+    let hwDeviceId: number | undefined;
+    let hwButtonId: number | undefined;
 
-    const maskId = mapping.condition.mask.id;
-    const maskEntry = physicalMasks.get(maskId);
-    if (!maskEntry) continue;
-    const device = deviceIdToDevice.get(maskEntry.deviceId);
+    if (hasMaskCondition(mapping)) {
+      const maskEntry = physicalMasks.get(mapping.condition.mask.id);
+      if (!maskEntry) continue;
+      hwDeviceId = maskEntry.deviceId;
+      hwButtonId = maskEntry.buttonId;
+    } else if (hasHardwareCondition(mapping)) {
+      hwDeviceId = mapping.condition.hardware.deviceId;
+      hwButtonId = mapping.condition.hardware.buttonId;
+    } else {
+      continue;
+    }
+
+    const device = deviceIdToDevice.get(hwDeviceId);
     if (!device) continue;
 
-    const btnId = toAzeronId(device, maskEntry.buttonId);
+    const btnId = toAzeronId(device, hwButtonId);
 
     if (mapping.jumpToLayer) {
       const targetId = mapping.jumpToLayer.layer;

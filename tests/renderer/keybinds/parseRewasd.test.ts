@@ -390,3 +390,37 @@ describe('parseRewasd radial menus', () => {
     expect(menus).toHaveLength(0)
   })
 })
+
+describe('parseRewasd hardware condition', () => {
+  const HW_FIXTURE = {
+    config: { appName: 'App' },
+    devices: {
+      hardware: [
+        { id: 1, name: 'gamepad' },
+        { id: 21, name: 'keyboard', type: 'standard' },
+        { id: 33, name: 'mouse' },
+      ],
+    },
+    mappings: [
+      {
+        description: 'Ctrl+Z',
+        condition: { hardware: { deviceId: 1, buttonId: 1 } },
+        macros: [
+          { keyboard: { buttonId: 29, description: 'DIK_LCONTROL' } },
+          { keyboard: { buttonId: 44, description: 'DIK_Z' } },
+        ],
+      },
+      {
+        description: 'A',
+        condition: { hardware: { deviceId: 1, buttonId: 5 } },
+        macros: [{ keyboard: { buttonId: 30, description: 'DIK_A' } }],
+      },
+    ],
+  }
+
+  it('maps hardware-condition bindings to the correct button', () => {
+    const profile = parseRewasd(HW_FIXTURE).find(p => p.device === 'cyborg')!
+    expect(profile.layers.default['1']?.bindings.single).toBe('Ctrl+Z')
+    expect(profile.layers.default['2']?.bindings.single).toBe('A')
+  })
+})

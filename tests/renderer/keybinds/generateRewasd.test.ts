@@ -371,3 +371,119 @@ describe("generateRewasd — all activator types", () => {
     expect(m).toBeDefined();
   });
 });
+
+describe("generateRewasd — radial menus", () => {
+  const withRadial: Profile = {
+    id: "radial-cyborg",
+    label: "RadialApp",
+    platform: "windows",
+    type: "rewasd",
+    device: "cyborg",
+    layers: {
+      default: {
+        "28": { zone: "unzoned", label: "RadialTrigger", bindings: {} },
+      },
+    },
+    radialMenus: [
+      {
+        id: "menu-1",
+        label: "My Menu",
+        trigger: "28",
+        color: "#ff1e1e",
+        actions: [
+          { label: "Up",    direction: "↑", binding: "A" },
+          { label: "Down",  direction: "↓", binding: "B" },
+          { label: "Left",  direction: "←", binding: "C" },
+          { label: "Right", direction: "→", binding: "D" },
+        ],
+      },
+    ],
+  };
+
+  it("emits a radialMenu shift", () => {
+    const file = generateRewasd([withRadial]);
+    expect(file.shifts?.some((s) => s.type === "radialMenu")).toBe(true);
+  });
+
+  it("emits radialMenuCircles with one root circle", () => {
+    const file = generateRewasd([withRadial]);
+    expect(file.radialMenuCircles).toHaveLength(1);
+    expect(file.radialMenuCircles?.[0].sectors).toHaveLength(4);
+  });
+
+  it("emits four radialMenuSectors", () => {
+    const file = generateRewasd([withRadial]);
+    expect(file.radialMenuSectors).toHaveLength(4);
+  });
+
+  it("sector description matches action label", () => {
+    const file = generateRewasd([withRadial]);
+    const upSector = file.radialMenuSectors?.find((s) => s.description === "Up");
+    expect(upSector).toBeDefined();
+  });
+
+  it("sector color matches menu color #ff1e1e → [255, 30, 30]", () => {
+    const file = generateRewasd([withRadial]);
+    expect(file.radialMenuSectors?.[0].color).toEqual([255, 30, 30]);
+  });
+
+  it("emits radialMenuSet masks for each leaf sector", () => {
+    const file = generateRewasd([withRadial]);
+    const radialMasks = file.masks?.filter((m) => m.radialMenuSet);
+    expect(radialMasks).toHaveLength(4);
+  });
+
+  it("emits a jumpToLayer trigger mapping for the menu trigger button", () => {
+    const file = generateRewasd([withRadial]);
+    const radialShiftId = file.shifts?.find((s) => s.type === "radialMenu")?.id!;
+    const triggerMapping = file.mappings.find(
+      (m) => m.jumpToLayer?.layer === radialShiftId && m.description === "My Menu",
+    );
+    expect(triggerMapping).toBeDefined();
+  });
+
+  it("emits action mappings under the radial shift", () => {
+    const file = generateRewasd([withRadial]);
+    const radialShiftId = file.shifts?.find((s) => s.type === "radialMenu")?.id!;
+    const actionMappings = file.mappings.filter(
+      (m) => (m as any).condition?.shiftId === radialShiftId,
+    );
+    expect(actionMappings).toHaveLength(4);
+  });
+
+  it("nested submenu produces a child circle", () => {
+    const withNested: Profile = {
+      ...withRadial,
+      radialMenus: [
+        {
+          id: "menu-nested",
+          label: "Nested",
+          trigger: "28",
+          color: "#4c1d95",
+          actions: [
+            {
+              label: "Sub",
+              direction: "↑",
+              submenu: {
+                id: "submenu-1",
+                label: "Sub Menu",
+                trigger: "28",
+                color: "#4c1d95",
+                actions: [
+                  { label: "A1", direction: "↑", binding: "A" },
+                  { label: "A2", direction: "↓", binding: "B" },
+                ],
+              },
+            },
+            { label: "Other", direction: "↓", binding: "C" },
+          ],
+        },
+      ],
+    };
+    const file = generateRewasd([withNested]);
+    expect(file.radialMenuCircles).toHaveLength(2);
+    const subSector = file.radialMenuSectors?.find((s) => s.description === "Sub");
+    expect(subSector?.childCircleId).toBeDefined();
+    expect(file.radialMenuCircles?.[0].id).toBeDefined();
+  });
+});

@@ -89,3 +89,52 @@ describe("App — handleButtonSave", () => {
     expect((window as any).keybindsApi.saveProfile).toHaveBeenCalled();
   });
 });
+
+describe("App — combo selection", () => {
+  it("renders combos panel with empty state for profiles without combos", async () => {
+    render(<App />);
+    await act(async () => {});
+    expect(
+      screen.getByText("No combos defined for this profile."),
+    ).toBeInTheDocument();
+  });
+
+  it("clears combo selection when a zone is toggled", async () => {
+    const profileWithCombos: Profile = {
+      id: "cyborg-windows-default",
+      label: "Windows Default",
+      platform: "windows",
+      type: "rewasd",
+      device: "cyborg",
+      layers: { default: {} },
+      imported: true,
+      combos: [
+        {
+          buttons: ["1", "2"],
+          zone: "edit",
+          label: "Chord",
+          bindings: { single: "Ctrl+Z" },
+          layer: "default",
+        },
+      ],
+    };
+    let loadCb: ((profiles: Profile[]) => void) | undefined;
+    (window as any).keybindsApi.onProfilesLoad = vi.fn(
+      (cb: (p: Profile[]) => void) => {
+        loadCb = cb;
+      },
+    );
+    render(<App />);
+    await act(async () => {
+      loadCb?.([profileWithCombos]);
+    });
+
+    // Select the combo row
+    await userEvent.click(screen.getByText("Chord"));
+    expect(document.querySelector(".combo-row.selected")).toBeTruthy();
+
+    // Toggle a zone — combo selection should clear
+    await userEvent.click(screen.getByText("Editing"));
+    expect(document.querySelector(".combo-row.selected")).toBeNull();
+  });
+});

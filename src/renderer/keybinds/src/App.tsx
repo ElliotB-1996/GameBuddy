@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import "./index.css";
 import { profiles } from "./data/profiles";
-import type { Zone, Profile, Button } from "./data/types";
+import type { Zone, Profile, Button, Combo, Device } from "./data/types";
+import CombosPanel from "./components/CombosPanel";
 import Legend from "./components/Legend";
 import DeviceSection from "./components/DeviceSection";
 import RadialMenus from "./components/RadialMenus";
@@ -78,7 +79,7 @@ const PROFILE_PAIRS = [
 const BUILTIN_IDS = new Set(profiles.map((p) => p.id));
 
 export default function App(): JSX.Element {
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(1);
   const [activeZone, setActiveZone] = useState<Zone | null>(null);
   const [importedProfiles, setImportedProfiles] = useState<Profile[]>([]);
   const importedProfilesRef = useRef<Profile[]>([]);
@@ -86,11 +87,17 @@ export default function App(): JSX.Element {
     importedProfilesRef.current = importedProfiles;
   }, [importedProfiles]);
   const [importError, setImportError] = useState<string | null>(null);
+  const [selectedComboIdx, setSelectedComboIdx] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadImportedProfiles().then(setImportedProfiles);
   }, []);
+
+  function switchTab(idx: number): void {
+    setActiveTab(idx);
+    setSelectedComboIdx(null);
+  }
 
   useEffect(() => {
     const windowsDefaultIdx = PROFILE_PAIRS.findIndex(
@@ -100,7 +107,7 @@ export default function App(): JSX.Element {
       const idx = PROFILE_PAIRS.findIndex((p) =>
         p.appNames.some((n) => n.toLowerCase() === processName.toLowerCase()),
       );
-      setActiveTab(idx >= 0 ? idx : windowsDefaultIdx);
+      switchTab(idx >= 0 ? idx : windowsDefaultIdx);
     });
     return () => window.keybindsApi.removeActiveAppListener();
   }, []);
@@ -126,7 +133,13 @@ export default function App(): JSX.Element {
   }, [importedProfiles]);
 
   function toggleZone(zone: Zone): void {
+    setSelectedComboIdx(null);
     setActiveZone((prev) => (prev === zone ? null : zone));
+  }
+
+  function handleComboSelect(idx: number | null): void {
+    setActiveZone(null);
+    setSelectedComboIdx(idx);
   }
 
   async function handleDeleteGroup(key: string): Promise<void> {
@@ -135,7 +148,7 @@ export default function App(): JSX.Element {
     setImportedProfiles((prev) =>
       prev.filter((p) => (p.pairId ?? p.id) !== key),
     );
-    setActiveTab(0);
+    switchTab(0);
   }
 
   async function handleImport(file: File): Promise<void> {
@@ -149,7 +162,7 @@ export default function App(): JSX.Element {
       const next = [...importedProfiles, ...parsed];
       setImportedProfiles(next);
       const nextGroupCount = new Set(next.map((p) => p.pairId ?? p.id)).size;
-      setActiveTab(PROFILE_PAIRS.length + nextGroupCount - 1);
+      switchTab(PROFILE_PAIRS.length + nextGroupCount - 1);
       setImportError(null);
     } catch (e) {
       setImportError(
@@ -232,6 +245,25 @@ export default function App(): JSX.Element {
   const cyborg = pair ? resolveProfile(pair.cyborgId) : undefined;
   const cyro = pair ? resolveProfile(pair.cyroId) : undefined;
 
+  const activeCyborg = cyborg ?? importedCyborg;
+  const activeCyro = cyro ?? importedCyro;
+  const mergedCombos: { combo: Combo; device: Device }[] = [
+    ...(activeCyborg?.combos ?? []).map((combo) => ({
+      combo,
+      device: "cyborg" as Device,
+    })),
+    ...(activeCyro?.combos ?? []).map((combo) => ({
+      combo,
+      device: "cyro" as Device,
+    })),
+  ];
+  const selectedCombo =
+    selectedComboIdx !== null ? mergedCombos[selectedComboIdx] : null;
+  const highlightedButtons = selectedCombo
+    ? new Set(selectedCombo.combo.buttons)
+    : null;
+  const highlightDevice = selectedCombo?.device ?? null;
+
   return (
     <>
       <header className="header">
@@ -241,7 +273,7 @@ export default function App(): JSX.Element {
             <button
               key={i}
               className={`tab ${activeTab === i ? "active" : "inactive"}`}
-              onClick={() => setActiveTab(i)}
+              onClick={() => switchTab(i)}
             >
               {p.label}
               <span className="platform">{p.platform}</span>
@@ -254,7 +286,7 @@ export default function App(): JSX.Element {
               <button
                 key={key}
                 className={`tab ${activeTab === tabIndex ? "active" : "inactive"} tab-imported`}
-                onClick={() => setActiveTab(tabIndex)}
+                onClick={() => switchTab(tabIndex)}
               >
                 {group[0].label}
                 <span className="platform">rewasd</span>
@@ -311,6 +343,9 @@ export default function App(): JSX.Element {
                 <DeviceSection
                   profile={importedCyborg}
                   activeZone={activeZone}
+                  highlightedButtons={
+                    highlightDevice === "cyborg" ? highlightedButtons : null
+                  }
                   onSave={handleButtonSave}
                 />
               )}
@@ -319,6 +354,9 @@ export default function App(): JSX.Element {
                   <DeviceSection
                     profile={importedCyro}
                     activeZone={activeZone}
+                    highlightedButtons={
+                      highlightDevice === "cyro" ? highlightedButtons : null
+                    }
                     className="column"
                     onSave={handleButtonSave}
                   />
@@ -334,6 +372,9 @@ export default function App(): JSX.Element {
                 <DeviceSection
                   profile={cyborg}
                   activeZone={activeZone}
+                  highlightedButtons={
+                    highlightDevice === "cyborg" ? highlightedButtons : null
+                  }
                   onSave={handleButtonSave}
                 />
               )}
@@ -342,6 +383,9 @@ export default function App(): JSX.Element {
                   <DeviceSection
                     profile={cyro}
                     activeZone={activeZone}
+                    highlightedButtons={
+                      highlightDevice === "cyro" ? highlightedButtons : null
+                    }
                     className="column"
                     onSave={handleButtonSave}
                   />
@@ -351,6 +395,11 @@ export default function App(): JSX.Element {
             </>
           )}
         </div>
+        <CombosPanel
+          combos={mergedCombos}
+          selectedIndex={selectedComboIdx}
+          onSelect={handleComboSelect}
+        />
       </div>
     </>
   );

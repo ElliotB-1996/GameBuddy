@@ -4,7 +4,14 @@
       "Bash(npx vitest *)",
       "Bash(npm test *)",
       "PowerShell(npm run *)",
-      "PowerShell(git *)"
+      "PowerShell(git *)",
+      "PowerShell(npx vitest run tests/renderer/keybinds/generateRewasd.test.ts 2>&1)",
+      "PowerShell(npx tsc -p tsconfig.web.json --noEmit 2>&1)",
+      "PowerShell(cd C:\\\\Users\\\\ellio\\\\Documents\\\\ClaudeTesting && npm run lint -- src/renderer/keybinds/src/components/CyborgThumb.tsx tests/renderer/keybinds/CyborgThumb.test.tsx)",
+      "PowerShell(cd C:\\\\Users\\\\ellio\\\\Documents\\\\ClaudeTesting && npm run lint -- src/renderer/keybinds/src/components/CyborgThumb.tsx)",
+      "PowerShell(npm test *)",
+      "PowerShell(git diff *)",
+      "PowerShell(npx vitest run tests/renderer/keybinds/DeviceSection.test.tsx 2>&1)"
     ],
     "defaultMode": "acceptEdits"
   },

@@ -10,7 +10,7 @@ React + TypeScript SPA that renders Azeron Cyborg and Cyro keybind profiles. Pro
 
 - `Profile` — one device's keybind layout. Has `layers.default` (required) and optionally `layers.shift`. `pairId` links a Cyborg and Cyro profile from the same reWASD file.
 - `Layer` — `Record<string, Button>` where keys are **Azeron button numbers** (not reWASD button IDs).
-- `Button` — `{ zone, label, bindings: { single?, long?, double? } }`
+- `Button` — `{ zone, label, bindings: { single?, double?, triple?, long?, down?, up?, turbo?, toggle? } }`
 - `Zone` — `'app' | 'terminal' | 'edit' | 'nav' | 'git' | 'mouse' | 'system' | 'thumb' | 'unzoned'`
 - `RadialMenu` / `RadialAction` — nested radial menu structure
 
@@ -20,10 +20,16 @@ React + TypeScript SPA that renders Azeron Cyborg and Cyro keybind profiles. Pro
 
 ## reWASD parser (`src/importers/parseRewasd.ts`)
 
+Raw file schema types live in `src/importers/rewasdSchema.ts` (shared with the future generator).
+
 Handles two mapping styles from `.rewasd` files:
 
 - **Description-based** (e.g. VSCode profiles): `"Cyborg #N - Label KeyCombo"` — regex extracts device, button number, label, binding directly.
-- **Mask-based** (e.g. WoW profiles): button identity from `masks[].set[].{deviceId, buttonId}`, binding from `macros[].keyboard.description` (DIK_ key names).
+- **Mask-based** (e.g. WoW profiles): button identity from `masks[].set[].{deviceId, buttonId}`, binding from `macros[]`. A mask with multiple `set[]` entries is a **combination** (all buttons held simultaneously).
+
+Activator types: `single | double | triple | long | start (→ down) | release (→ up)`. Modes: `hold_until_release | onetime | turbo | toggle`. Both `type` and `mode` are checked — turbo/toggle are resolved from `mode` before falling back to `type`. See `resolveActivatorType()`.
+
+Macro types: keyboard (DIK_ names), mouse button (`buttonId`), mouse movement (`direction`), mouse wheel (`wheel`), reWASD command (`id` referencing `commands[]`).
 
 **Critical:** reWASD uses different button numbering from Azeron. `CYBORG_BTN` and `CYRO_BTN` lookup tables in the parser translate reWASD `buttonId` → Azeron button number. See the Obsidian skill at `references/button-id-mapping.md` for the full table.
 

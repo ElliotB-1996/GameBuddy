@@ -4,6 +4,8 @@ import type {
   Device,
   RadialMenu,
   RadialAction,
+  Combo,
+  ButtonBinding,
 } from "../data/types";
 import { ParseError } from "./errors";
 import type {
@@ -478,6 +480,8 @@ export function parseRewasd(json: unknown): Profile[] {
   if (!isRewasdFile(json))
     throw new ParseError("Not a valid reWASD profile file");
 
+  console.log(json);
+
   const appName = json.config.appName;
   const shifts = json.shifts ?? [];
 
@@ -499,10 +503,15 @@ export function parseRewasd(json: unknown): Profile[] {
   }
 
   // Physical mask index: maskId → {deviceId, buttonId}
+  // Combo mask index: maskId → all entries (multiple buttons held simultaneously)
   const physicalMasks = new Map<number, RewasdMaskSet>();
+  const comboMasks = new Map<number, RewasdMaskSet[]>();
   for (const mask of json.masks ?? []) {
-    if (mask.set && mask.set.length > 0) {
+    if (!mask.set || mask.set.length === 0) continue;
+    if (mask.set.length === 1) {
       physicalMasks.set(mask.id, mask.set[0]);
+    } else {
+      comboMasks.set(mask.id, mask.set);
     }
   }
 
@@ -515,6 +524,7 @@ export function parseRewasd(json: unknown): Profile[] {
   if (gamepads[1]) deviceIdToDevice.set(gamepads[1].id, "cyro");
 
   const byDevice = new Map<Device, Record<string, Layer>>();
+  const byDeviceCombos = new Map<Device, Combo[]>();
 
   function getLayer(device: Device, layerKey: string): Layer {
     if (!byDevice.has(device)) byDevice.set(device, { default: {} });
@@ -574,6 +584,48 @@ export function parseRewasd(json: unknown): Profile[] {
         );
         continue;
       }
+    }
+
+    // ── Combo mask (multiple buttons held simultaneously) ──
+    if (
+      hasMaskCondition(mapping) &&
+      comboMasks.has(mapping.condition.mask.id)
+    ) {
+      const entries = comboMasks.get(mapping.condition.mask.id)!;
+      let device: Device | undefined;
+      const buttons: string[] = [];
+      for (const entry of entries) {
+        const d = deviceIdToDevice.get(entry.deviceId);
+        if (!device && d) device = d;
+        if (d) buttons.push(toAzeronId(d, entry.buttonId));
+      }
+      if (device && buttons.length > 0) {
+        const binding = mapping.jumpToLayer
+          ? (() => {
+              const targetId = mapping.jumpToLayer.layer;
+              if (radialShiftIds.has(targetId)) return undefined;
+              if (targetId === 0) return "→ Default";
+              const targetKey = shiftIdToLayerKey.get(targetId);
+              if (!targetKey) return undefined;
+              return `→ ${layerLabelsMap.get(targetKey) ?? shiftLayerDisplayName(targetKey)}`;
+            })()
+          : macrosToBinding(mapping.macros ?? []);
+        const label =
+          (mapping.description?.trim() || binding) ??
+          `Combo ${buttons.join("+")}`;
+        const bindings: ButtonBinding = {};
+        if (binding) bindings[activator] = binding;
+        const combo: Combo = {
+          buttons,
+          zone: "unzoned",
+          label,
+          bindings,
+          layer: layerKey,
+        };
+        if (!byDeviceCombos.has(device)) byDeviceCombos.set(device, []);
+        byDeviceCombos.get(device)!.push(combo);
+      }
+      continue;
     }
 
     // ── Mask-based or direct-hardware fallback ──
@@ -641,6 +693,9 @@ export function parseRewasd(json: unknown): Profile[] {
     layers: layers as Profile["layers"],
     ...(layerLabels ? { layerLabels } : {}),
     radialMenus,
+    ...(byDeviceCombos.has(device)
+      ? { combos: byDeviceCombos.get(device)! }
+      : {}),
     imported: true as const,
   }));
 }

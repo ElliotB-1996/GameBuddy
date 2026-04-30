@@ -15,7 +15,7 @@ const ZONES: Zone[] = [
 ];
 
 const POPUP_WIDTH = 240;
-const POPUP_HEIGHT = 330;
+const POPUP_HEIGHT = 490;
 
 interface Props {
   buttonId: string;
@@ -35,8 +35,13 @@ export default function EditPopup({
   const [label, setLabel] = useState(button.label);
   const [zone, setZone] = useState<Zone>(button.zone);
   const [single, setSingle] = useState(button.bindings.single ?? "");
-  const [long, setLong] = useState(button.bindings.long ?? "");
   const [double, setDouble] = useState(button.bindings.double ?? "");
+  const [triple, setTriple] = useState(button.bindings.triple ?? "");
+  const [long, setLong] = useState(button.bindings.long ?? "");
+  const [down, setDown] = useState(button.bindings.down ?? "");
+  const [up, setUp] = useState(button.bindings.up ?? "");
+  const [turbo, setTurbo] = useState(button.bindings.turbo ?? "");
+  const [toggle, setToggle] = useState(button.bindings.toggle ?? "");
   const popupRef = useRef<HTMLDivElement>(null);
 
   const margin = 8;
@@ -62,8 +67,13 @@ export default function EditPopup({
   function handleSave(): void {
     const bindings: Button["bindings"] = {};
     if (single) bindings.single = single;
-    if (long) bindings.long = long;
     if (double) bindings.double = double;
+    if (triple) bindings.triple = triple;
+    if (long) bindings.long = long;
+    if (down) bindings.down = down;
+    if (up) bindings.up = up;
+    if (turbo) bindings.turbo = turbo;
+    if (toggle) bindings.toggle = toggle;
     onSave({ label, zone, bindings });
   }
 
@@ -108,6 +118,24 @@ export default function EditPopup({
           />
         </div>
         <div className="edit-popup-binding-row">
+          <span className="edit-popup-binding-type">Double</span>
+          <input
+            className="edit-popup-input"
+            value={double}
+            onChange={(e) => setDouble(e.target.value)}
+            placeholder="none"
+          />
+        </div>
+        <div className="edit-popup-binding-row">
+          <span className="edit-popup-binding-type">Triple</span>
+          <input
+            className="edit-popup-input"
+            value={triple}
+            onChange={(e) => setTriple(e.target.value)}
+            placeholder="none"
+          />
+        </div>
+        <div className="edit-popup-binding-row">
           <span className="edit-popup-binding-type">Long</span>
           <input
             className="edit-popup-input"
@@ -117,11 +145,38 @@ export default function EditPopup({
           />
         </div>
         <div className="edit-popup-binding-row">
-          <span className="edit-popup-binding-type">Double</span>
+          <span className="edit-popup-binding-type">Down</span>
           <input
             className="edit-popup-input"
-            value={double}
-            onChange={(e) => setDouble(e.target.value)}
+            value={down}
+            onChange={(e) => setDown(e.target.value)}
+            placeholder="none"
+          />
+        </div>
+        <div className="edit-popup-binding-row">
+          <span className="edit-popup-binding-type">Up</span>
+          <input
+            className="edit-popup-input"
+            value={up}
+            onChange={(e) => setUp(e.target.value)}
+            placeholder="none"
+          />
+        </div>
+        <div className="edit-popup-binding-row">
+          <span className="edit-popup-binding-type">Turbo</span>
+          <input
+            className="edit-popup-input"
+            value={turbo}
+            onChange={(e) => setTurbo(e.target.value)}
+            placeholder="none"
+          />
+        </div>
+        <div className="edit-popup-binding-row">
+          <span className="edit-popup-binding-type">Toggle</span>
+          <input
+            className="edit-popup-input"
+            value={toggle}
+            onChange={(e) => setToggle(e.target.value)}
             placeholder="none"
           />
         </div>

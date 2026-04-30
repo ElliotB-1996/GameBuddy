@@ -13,8 +13,13 @@ export type Zone =
 
 export interface ButtonBinding {
   single?: string;
-  long?: string;
   double?: string;
+  triple?: string;
+  long?: string;
+  down?: string;
+  up?: string;
+  turbo?: string;
+  toggle?: string;
 }
 
 export interface Button {
@@ -24,6 +29,14 @@ export interface Button {
 }
 
 export type Layer = Record<string, Button>;
+
+export interface Combo {
+  buttons: string[]; // Azeron button numbers that must all be held simultaneously
+  zone: Zone;
+  label: string;
+  bindings: ButtonBinding;
+  layer: string; // "default" | "shift" | "shift-2" | …
+}
 
 export interface Profile {
   id: string;
@@ -38,6 +51,7 @@ export interface Profile {
   };
   layerLabels?: Record<string, string>;
   radialMenus?: RadialMenu[];
+  combos?: Combo[];
   notes?: string;
   imported?: true;
 }

@@ -658,4 +658,119 @@ describe("round-trip: generateRewasd → parseRewasd", () => {
     expect(reparsed.find((p) => p.device === "cyborg")?.layers.default["1"]?.bindings.single).toBe("A");
     expect(reparsed.find((p) => p.device === "cyro")?.layers.default["1"]?.bindings.single).toBe("B");
   });
+
+  it("combo chord binding survives round-trip", () => {
+    const profile: Profile = {
+      id: "rt-combo",
+      label: "RTCombo",
+      platform: "windows",
+      type: "rewasd",
+      device: "cyborg",
+      layers: {
+        default: {
+          "3": { zone: "unzoned", label: "Anchor", bindings: { single: "Z" } },
+        },
+      },
+      combos: [
+        {
+          buttons: ["1", "2"],
+          zone: "unzoned",
+          label: "ChordAB",
+          bindings: { single: "A" },
+          layer: "default",
+        },
+      ],
+    };
+    const reparsed = parseRewasd(generateRewasd([profile]));
+    const cyborg = reparsed.find((p) => p.device === "cyborg")!;
+    expect(cyborg.combos).toHaveLength(1);
+    expect(cyborg.combos?.[0].buttons).toContain("1");
+    expect(cyborg.combos?.[0].buttons).toContain("2");
+    expect(cyborg.combos?.[0].bindings.single).toBe("A");
+  });
+});
+
+describe("generateRewasd — combos", () => {
+  const withCombo: Profile = {
+    id: "combo-cyborg",
+    label: "ComboApp",
+    platform: "windows",
+    type: "rewasd",
+    device: "cyborg",
+    layers: { default: {} },
+    combos: [
+      {
+        buttons: ["1", "2"],
+        zone: "unzoned",
+        label: "ChordAB",
+        bindings: { single: "A" },
+        layer: "default",
+      },
+    ],
+  };
+
+  it("emits a multi-entry mask for a 2-button combo", () => {
+    const file = generateRewasd([withCombo]);
+    const comboMask = file.masks?.find((m) => m.set && m.set.length === 2);
+    expect(comboMask).toBeDefined();
+    expect(comboMask?.set?.[0]).toEqual({ deviceId: 1, buttonId: 1 });
+    expect(comboMask?.set?.[1]).toEqual({ deviceId: 1, buttonId: 5 });
+  });
+
+  it("emits a mapping referencing the combo mask id", () => {
+    const file = generateRewasd([withCombo]);
+    const comboMask = file.masks?.find((m) => m.set && m.set.length === 2);
+    const mapping = file.mappings.find((m) => m.description === "ChordAB");
+    expect(mapping).toBeDefined();
+    expect((mapping as any).condition.mask.id).toBe(comboMask?.id);
+    expect(mapping?.macros?.[0].keyboard?.description).toBe("DIK_A");
+  });
+
+  it("shifted combo carries shiftId on the condition", () => {
+    const withShiftedCombo: Profile = {
+      id: "combo-shift",
+      label: "ComboShiftApp",
+      platform: "windows",
+      type: "rewasd",
+      device: "cyborg",
+      layerLabels: { shift: "Fn" },
+      layers: { default: {}, shift: {} },
+      combos: [
+        {
+          buttons: ["1", "2"],
+          zone: "unzoned",
+          label: "ShiftedChord",
+          bindings: { single: "B" },
+          layer: "shift",
+        },
+      ],
+    };
+    const file = generateRewasd([withShiftedCombo]);
+    const shiftId = file.shifts?.[0].id!;
+    const mapping = file.mappings.find((m) => m.description === "ShiftedChord");
+    expect((mapping as any).condition.shiftId).toBe(shiftId);
+  });
+
+  it("skips a combo where fewer than 2 buttons map to the device table", () => {
+    const withBadCombo: Profile = {
+      id: "combo-degenerate",
+      label: "DegenerateApp",
+      platform: "windows",
+      type: "rewasd",
+      device: "cyborg",
+      layers: { default: {} },
+      combos: [
+        {
+          buttons: ["1", "99"],
+          zone: "unzoned",
+          label: "BadCombo",
+          bindings: { single: "A" },
+          layer: "default",
+        },
+      ],
+    };
+    const file = generateRewasd([withBadCombo]);
+    expect(file.masks).toBeUndefined();
+    expect(file.mappings.find((m) => m.description === "BadCombo")).toBeUndefined();
+  });
 });

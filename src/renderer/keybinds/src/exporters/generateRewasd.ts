@@ -523,6 +523,60 @@ export function generateRewasd(profiles: Profile[]): RewasdFile {
     }
   }
 
+  for (const p of profiles) {
+    if (!p.combos || p.combos.length === 0) continue;
+    const deviceId = p.device === "cyborg" ? 1 : 2;
+    const btnInv = p.device === "cyborg" ? CYBORG_BTN_INV : CYRO_BTN_INV;
+
+    for (const combo of p.combos) {
+      const mappedIds = combo.buttons
+        .map((b) => btnInv[b])
+        .filter((id): id is number => id !== undefined);
+      if (mappedIds.length < 2) continue;
+
+      const maskId = nextMaskId++;
+      masks.push({
+        id: maskId,
+        set: mappedIds.map((buttonId) => ({ deviceId, buttonId })),
+      });
+
+      const shiftId =
+        combo.layer !== "default"
+          ? layerKeyToShiftId.get(combo.layer)
+          : undefined;
+
+      for (const activatorType of BINDING_ACTIVATORS) {
+        const binding = combo.bindings[activatorType];
+        if (!binding) continue;
+
+        const condition: RewasdConditionMask = {
+          ...(shiftId !== undefined ? { shiftId } : {}),
+          mask: { id: maskId, activator: activatorToRewasd(activatorType) },
+        };
+
+        if (binding.startsWith("→ ")) {
+          const targetLayer = resolveLayerTarget(binding);
+          if (targetLayer !== undefined) {
+            mappings.push({
+              description: combo.label,
+              condition,
+              jumpToLayer: { layer: targetLayer },
+            });
+          }
+        } else {
+          const macros = bindingToMacros(binding);
+          if (macros.length > 0) {
+            mappings.push({
+              description: combo.label,
+              condition,
+              macros,
+            });
+          }
+        }
+      }
+    }
+  }
+
   const radialMenuCircles: RewasdCircle[] = [];
   const radialMenuSectors: RewasdSector[] = [];
   let nextCircleId = 1;

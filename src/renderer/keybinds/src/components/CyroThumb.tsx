@@ -4,6 +4,7 @@ import { CYRO_THUMB } from "../data/layout";
 interface Props {
   layer: Layer;
   activeZone: Zone | null;
+  highlightedButtons?: Set<string> | null;
   isEditing?: boolean;
   onEditButton?: (id: string, rect: DOMRect) => void;
 }
@@ -11,6 +12,7 @@ interface Props {
 export default function CyroThumb({
   layer,
   activeZone,
+  highlightedButtons,
   isEditing,
   onEditButton,
 }: Props): JSX.Element {
@@ -42,7 +44,8 @@ export default function CyroThumb({
               </div>
             );
           const dimmed =
-            activeZone !== null && activeZone !== btn.zone
+            (activeZone !== null && activeZone !== btn.zone) ||
+            (highlightedButtons != null && !highlightedButtons.has(id))
               ? { opacity: 0.1 }
               : undefined;
           return (
@@ -62,16 +65,46 @@ export default function CyroThumb({
                     <span className="tip-binding">{btn.bindings.single}</span>
                   </div>
                 )}
+                {btn.bindings.double && (
+                  <div className="tip-row">
+                    <span className="tip-type">Double</span>
+                    <span className="tip-binding">{btn.bindings.double}</span>
+                  </div>
+                )}
+                {btn.bindings.triple && (
+                  <div className="tip-row">
+                    <span className="tip-type">Triple</span>
+                    <span className="tip-binding">{btn.bindings.triple}</span>
+                  </div>
+                )}
                 {btn.bindings.long && (
                   <div className="tip-row">
                     <span className="tip-type">Long</span>
                     <span className="tip-binding">{btn.bindings.long}</span>
                   </div>
                 )}
-                {btn.bindings.double && (
+                {btn.bindings.down && (
                   <div className="tip-row">
-                    <span className="tip-type">Double</span>
-                    <span className="tip-binding">{btn.bindings.double}</span>
+                    <span className="tip-type">Down</span>
+                    <span className="tip-binding">{btn.bindings.down}</span>
+                  </div>
+                )}
+                {btn.bindings.up && (
+                  <div className="tip-row">
+                    <span className="tip-type">Up</span>
+                    <span className="tip-binding">{btn.bindings.up}</span>
+                  </div>
+                )}
+                {btn.bindings.turbo && (
+                  <div className="tip-row">
+                    <span className="tip-type">Turbo</span>
+                    <span className="tip-binding">{btn.bindings.turbo}</span>
+                  </div>
+                )}
+                {btn.bindings.toggle && (
+                  <div className="tip-row">
+                    <span className="tip-type">Toggle</span>
+                    <span className="tip-binding">{btn.bindings.toggle}</span>
                   </div>
                 )}
               </div>

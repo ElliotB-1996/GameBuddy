@@ -126,7 +126,7 @@ describe("DeviceSection", () => {
   });
 
   it("dims a grid button when its id is not in highlightedButtons", () => {
-    const { container } = render(
+    render(
       <DeviceSection
         profile={cyborgProfile}
         activeZone={null}

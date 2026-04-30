@@ -9,6 +9,7 @@ import EditPopup from "./EditPopup";
 interface Props {
   profile: Profile;
   activeZone: Zone | null;
+  highlightedButtons?: Set<string> | null;
   className?: string;
   onSave: (
     profileId: string,
@@ -21,6 +22,7 @@ interface Props {
 export default function DeviceSection({
   profile,
   activeZone,
+  highlightedButtons,
   className,
   onSave,
 }: Props): JSX.Element {
@@ -128,6 +130,7 @@ export default function DeviceSection({
                 id={id}
                 button={layer[id]}
                 activeZone={activeZone}
+                highlightedButtons={highlightedButtons}
                 isEditing={isEditing}
                 onEditButton={handleEditButton}
               />
@@ -141,6 +144,7 @@ export default function DeviceSection({
         <CyborgThumb
           layer={layer}
           activeZone={activeZone}
+          highlightedButtons={highlightedButtons}
           isEditing={isEditing}
           onEditButton={handleEditButton}
         />
@@ -148,6 +152,7 @@ export default function DeviceSection({
         <CyroThumb
           layer={layer}
           activeZone={activeZone}
+          highlightedButtons={highlightedButtons}
           isEditing={isEditing}
           onEditButton={handleEditButton}
         />

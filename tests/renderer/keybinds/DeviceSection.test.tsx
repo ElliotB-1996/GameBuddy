@@ -124,4 +124,30 @@ describe("DeviceSection", () => {
       expect.objectContaining({ label: "Copy", zone: "edit" }),
     );
   });
+
+  it("dims a grid button when its id is not in highlightedButtons", () => {
+    const { container } = render(
+      <DeviceSection
+        profile={cyborgProfile}
+        activeZone={null}
+        highlightedButtons={new Set(["99"])}
+        onSave={vi.fn()}
+      />,
+    );
+    const btn = screen.getByText("Copy").closest(".btn") as HTMLElement;
+    expect(btn.style.opacity).toBe("0.1");
+  });
+
+  it("does not dim a grid button when its id is in highlightedButtons", () => {
+    render(
+      <DeviceSection
+        profile={cyborgProfile}
+        activeZone={null}
+        highlightedButtons={new Set(["1"])}
+        onSave={vi.fn()}
+      />,
+    );
+    const btn = screen.getByText("Copy").closest(".btn") as HTMLElement;
+    expect(btn.style.opacity).toBe("");
+  });
 });

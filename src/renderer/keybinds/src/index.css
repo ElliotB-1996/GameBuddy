@@ -197,3 +197,38 @@ body {
 .edit-popup-cancel:hover { border-color: #4c1d95; color: #a78bfa; }
 .edit-popup-save { padding: 4px 10px; border-radius: 4px; font-size: 11px; background: #4c1d95; color: #e2e8f0; border: none; cursor: pointer; }
 .edit-popup-save:hover { background: #6d28d9; }
+
+/* ── Combos Panel ── */
+.combo-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.combo-row {
+  display: flex; align-items: center; gap: 8px; padding: 6px 8px;
+  border-radius: 4px; cursor: pointer; font-size: 13px; color: #94a3b8;
+  transition: background 0.15s; flex-wrap: wrap;
+}
+.combo-row:hover { background: #1e1b4b; color: #e2e8f0; }
+.combo-row.selected { background: #2d1b69; color: #e2e8f0; }
+.combo-chips { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+.combo-chip-group { display: flex; align-items: center; gap: 3px; }
+.combo-chip {
+  font-family: monospace; font-size: 11px; font-weight: 700;
+  background: #1e0d4a; color: #a78bfa; border: 1px solid #4c1d95;
+  border-radius: 3px; padding: 1px 5px;
+}
+.combo-plus { font-size: 11px; color: #4c1d95; }
+.combo-label { font-weight: 600; flex-shrink: 0; }
+.combo-zone {
+  font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 3px;
+  border: 1px solid transparent; text-transform: uppercase; letter-spacing: 1px;
+  flex-shrink: 0;
+}
+.combo-layer {
+  font-size: 10px; color: #7c3aed; background: #1e1b4b; border: 1px solid #2d1b69;
+  border-radius: 3px; padding: 1px 5px; font-family: monospace; flex-shrink: 0;
+}
+.combo-bindings { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; }
+.combo-binding-entry { display: flex; align-items: baseline; gap: 4px; }
+.combo-binding-type {
+  font-size: 9px; color: #6d5fa8; text-transform: uppercase;
+  letter-spacing: 1px; flex-shrink: 0;
+}
+.combo-binding-value { font-size: 13px; color: #e2e8f0; font-weight: 700; }

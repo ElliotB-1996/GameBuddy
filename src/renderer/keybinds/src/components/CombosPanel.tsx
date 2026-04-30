@@ -33,7 +33,7 @@ export default function CombosPanel({
         <ul className="combo-list">
           {combos.map(({ combo }, idx) => (
             <li
-              key={idx}
+              key={`${combo.buttons.join("+")}-${combo.layer}`}
               className={`combo-row${selectedIndex === idx ? " selected" : ""}`}
               onClick={() => onSelect(selectedIndex === idx ? null : idx)}
             >

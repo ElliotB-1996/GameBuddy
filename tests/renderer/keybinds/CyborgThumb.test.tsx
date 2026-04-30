@@ -41,4 +41,28 @@ describe("CyborgThumb", () => {
     await userEvent.click(screen.getByText("Jump").closest(".tbtn")!);
     expect(onEditButton).not.toHaveBeenCalled();
   });
+
+  it("dims thumb button when highlightedButtons is set and id not in set", () => {
+    render(
+      <CyborgThumb
+        layer={layer}
+        activeZone={null}
+        highlightedButtons={new Set(["99"])}
+      />,
+    );
+    const btn = screen.getByText("Jump").closest(".tbtn") as HTMLElement;
+    expect(btn.style.opacity).toBe("0.1");
+  });
+
+  it("does not dim thumb button when id is in highlightedButtons", () => {
+    render(
+      <CyborgThumb
+        layer={layer}
+        activeZone={null}
+        highlightedButtons={new Set(["22"])}
+      />,
+    );
+    const btn = screen.getByText("Jump").closest(".tbtn") as HTMLElement;
+    expect(btn.style.opacity).toBe("");
+  });
 });

@@ -11,7 +11,8 @@
       "PowerShell(cd C:\\\\Users\\\\ellio\\\\Documents\\\\ClaudeTesting && npm run lint -- src/renderer/keybinds/src/components/CyborgThumb.tsx)",
       "PowerShell(npm test *)",
       "PowerShell(git diff *)",
-      "PowerShell(npx vitest run tests/renderer/keybinds/DeviceSection.test.tsx 2>&1)"
+      "PowerShell(npx vitest run tests/renderer/keybinds/DeviceSection.test.tsx 2>&1)",
+      "PowerShell(New-Item -ItemType Directory -Path \"C:\\\\Users\\\\ellio\\\\Documents\\\\ClaudeTesting\\\\docs\\\\superpowers\\\\specs\" -Force)"
     ],
     "defaultMode": "acceptEdits"
   },
